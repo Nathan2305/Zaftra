@@ -5,11 +5,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:test_login/Presenter/PresenterLoginMVP.dart';
+import 'package:test_login/Utils/AnimationSource.dart';
 import 'package:test_login/Utils/DataSource.dart';
 import 'package:test_login/Utils/WidgetsX.dart';
 import 'package:test_login/View/RegisterScreen.dart';
 import 'package:test_login/View/interfaceLoginMVP.dart';
-import 'package:universal_io/io.dart';
+//import 'package:universal_io/io.dart';
 
 //PresenterLoginMVP presenterLoginMVP;
 PresenterLoginMVP presenterLoginMVP; //<--- variable can be null
@@ -327,14 +328,10 @@ class CardLogin extends StatelessWidget {
                               text: 'Registrate',
                               style: TextStyle(
                                   color: Colors.yellowAccent,
-                                  decoration: TextDecoration.underline,fontSize: 15),
+                                  decoration: TextDecoration.underline,fontSize: 17),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              RegisterScreen()));
+                                 Navigator.of(context).push(AnimationSource.createRoute());
                                 }),
                         ])),
                   ),
