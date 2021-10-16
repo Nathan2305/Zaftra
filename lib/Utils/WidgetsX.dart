@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 //import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
@@ -9,33 +10,36 @@ class WidgetsX {
       icon = Icon(
         Icons.warning,
         color: Colors.yellowAccent,
-        size: 40,
+        size: 30,
       );
     } else {
       icon = Icon(
         Icons.error,
         color: Colors.red,
-        size: 40,
+        size: 30,
       );
     }
     AlertDialog alertDialog = AlertDialog(
-      title: Text('Mensaje del servidor'),
-      //content:
-      content: Row(
+      title: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           icon,
-          Expanded(child: Text(msg, style: TextStyle(fontSize: 17)))
+          Text('Mensaje del servidor'),
         ],
+      ),
+      content: Container(
+        child: Text(msg, style: TextStyle(fontSize: 17)),
+        margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
       ),
       elevation: 24.0,
     );
     return alertDialog;
   }
 
-  static ProgressDialog showProgressDialog(BuildContext context) {
+  static ProgressDialog showProgressDialog(BuildContext context, String msg) {
     ProgressDialog pb = ProgressDialog(context, isDismissible: false);
     pb.style(
-        message: 'Iniciando sesión....',
+        message: msg,
         messageTextStyle: TextStyle(fontSize: 20),
         borderRadius: 10.0,
         elevation: 10.0,

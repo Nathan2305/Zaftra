@@ -95,7 +95,7 @@ class LoginScreen extends StatelessWidget implements interfaceLoginMVP {
   @override
   void notifyViewShowLottieDialog() {
     // TODO: implement notifyViewShowLottieDialog
-    pDialog = WidgetsX.showProgressDialog(fullcontext);
+    pDialog = WidgetsX.showProgressDialog(fullcontext,"Iniciando sesión");
     pDialog.show();
   }
 
@@ -328,7 +328,7 @@ class CardLogin extends StatelessWidget {
                               text: 'Registrate',
                               style: TextStyle(
                                   color: Colors.yellowAccent,
-                                  decoration: TextDecoration.underline,fontSize: 17),
+                                  decoration: TextDecoration.underline,fontSize: 18),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                  Navigator.of(context).push(AnimationSource.createRoute());
