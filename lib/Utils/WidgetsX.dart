@@ -29,7 +29,7 @@ class WidgetsX {
       ),
       content: Container(
         child: Text(msg, style: TextStyle(fontSize: 17)),
-        margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
       ),
       elevation: 24.0,
     );

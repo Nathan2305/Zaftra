@@ -6,4 +6,6 @@ abstract class interfaceLoginMVP {
   void notifyViewShowLottieDialog() {}
 
   void notifyViewCloseLottieDialog() {}
+
+  void notifyViewShowSuccessFullLogin() {}
 }

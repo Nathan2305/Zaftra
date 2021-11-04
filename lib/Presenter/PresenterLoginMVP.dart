@@ -28,4 +28,8 @@ class PresenterLoginMVP {
   void notifyViewCloseLottieDialog() {
     _interfaceLoginMVP.notifyViewCloseLottieDialog();
   }
+
+  void notifyViewShowSuccessFullLogin() {
+    _interfaceLoginMVP.notifyViewShowSuccessFullLogin();
+  }
 }

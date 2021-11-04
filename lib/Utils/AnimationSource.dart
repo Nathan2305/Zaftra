@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:test_login/View/RegisterScreen.dart';
 
 class AnimationSource {
-  static Route createRoute() {
+  static Route createRoute(Widget targetRoute) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => Register(),
+      pageBuilder: (context, animation, secondaryAnimation) => targetRoute,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;

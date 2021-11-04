@@ -4,20 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:test_login/Presenter/PresenterRegisterMVP.dart';
 import 'package:test_login/Utils/DataSource.dart';
+import 'package:test_login/Utils/ResponsiveWidget.dart';
 import 'package:test_login/Utils/ShakeView.dart';
 import 'package:test_login/Utils/WidgetsX.dart';
+import 'package:test_login/View/LoginScreen.dart';
 import 'package:test_login/View/interfaceRegisterMVP.dart';
 
-TextEditingController emailController = TextEditingController();
-TextEditingController nameRestaurantController = TextEditingController();
-TextEditingController passController = TextEditingController();
+TextEditingController emailController;
+TextEditingController nameRestaurantController;
+TextEditingController passController;
 PresenterRegisterMVP presenterRegisterMVP;
+
 ProgressDialog ploading;
 BuildContext fullctx;
-bool mailEmpty = false;
+bool emptyFields;
 ShakeController shakeController;
-bool visibleError = false;
 AlertDialog alertDialog;
+bool isVerySmall = false;
+Size size;
 
 void main() {
   runApp(Register());
@@ -36,28 +40,36 @@ class _Register extends State<Register>
     // TODO: implement build
     fullctx = context;
     presenterRegisterMVP = PresenterRegisterMVP(this);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth > 600) {
-          return WideLayout();
-        } else {
-          return NormalLayout();
-        }
-      },
+    return MaterialApp(
+      home: Scaffold(
+        //extendBodyBehindAppBar: true,
+          resizeToAvoidBottomInset: true,
+          appBar: AppBar(
+            title: Text('Registro'),
+            backgroundColor:DataSource.secondaryColor,
+          ),
+          body: ResponsiveWidget(
+            mobile: MobileLayout(),
+          )),
     );
   }
 
-  void change(bool isVisible) {
-    setState(() {
-      if (visibleError == false) {
-        visibleError = isVisible;
-      }
-    });
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    nameRestaurantController.dispose();
+    passController.dispose();
+    super.dispose();
   }
 
   @override
   void initState() {
     // TODO: implement initState
+    emptyFields = false;
+    emailController = TextEditingController();
+    nameRestaurantController = TextEditingController();
+    passController = TextEditingController();
     shakeController = ShakeController(vsync: this);
     super.initState();
   }
@@ -65,13 +77,20 @@ class _Register extends State<Register>
   @override
   void notifyViewEmptyField() {
     // TODO: implement notifyViewEmptyField
+    setState(() {
+      emptyFields = true;
+    });
     shakeController.shake();
-    change(true);
   }
 
   @override
   void notifyViewShowPDialogLoading() {
     // TODO: implement notifyViewShowPDialogLoading
+    if (emptyFields) {
+      setState(() {
+        emptyFields = false;
+      });
+    }
     ploading = WidgetsX.showProgressDialog(fullctx, "Registrando");
     ploading.show();
   }
@@ -101,119 +120,78 @@ class _Register extends State<Register>
   void notifyViewFinishRoute() {
     // TODO: implement notifyViewFinishRoute
     Navigator.pop(context);
+    initState();
+    //Navigator.pushReplacementNamed(context, LoginScreen().toString());
   }
 }
 
-class NormalLayout extends StatelessWidget {
-  get boxDecorationCard => BoxDecoration(
-      borderRadius: BorderRadius.circular(20.0),
-      gradient: LinearGradient(
-          begin: Alignment.bottomLeft,
-          end: Alignment.topRight,
-          colors: [
-            DataSource.primaryColor,
-            DataSource.secondaryColor,
-          ]));
-
+class MobileLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    size = MediaQuery.of(context).size;
+    if (size.height <= DataSource.SIZE_HEIGHT_VERY_SMALL_DEVICE) {
+      isVerySmall = true;
+    }
     // TODO: implement build
-    //presenterRegisterMVP = PresenterRegisterMVP(RegisterScreen());
-    return Scaffold(
-        backgroundColor: DataSource.secondaryColor,
-        body: Center(
-          child: Container(
-            margin: EdgeInsets.fromLTRB(10, 25, 10, 0),
-            child: SingleChildScrollView(
-              child: ShakeView(
-                child: Card(
-                  elevation: 10,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                            colors: [
-                              DataSource.primaryColor,
-                              DataSource.secondaryColor,
-                            ]),
-                        borderRadius: BorderRadius.circular(20.0)),
-                    child: Stack(
-                      //mainAxisAlignment: MainAxisAlignment.start,
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('assets/register_bground.png'),
+                fit: BoxFit.fill)),
+        child: Stack(
+          children: [
+            Align(
+              child: SingleChildScrollView(
+                child: ShakeView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        _TextFieldsEmpty(),
+                        _EditTextEmail(),
+                        _EditTextNameRest(),
+                        _EditTextPassword(),
                         Align(
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            margin: EdgeInsets.fromLTRB(10, 30, 0, 0),
-                            child: Text(
-                              'Registro',
-                              textScaleFactor: 2.2,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _EdittTextEmail(boxDecorationCard),
-                                _EditTextNameRest(boxDecorationCard),
-                                _EditTextPassword(boxDecorationCard),
-                                visibleError
-                                    ? Container(
-                                        padding: EdgeInsets.all(3),
-                                        color: Colors.black,
-                                        child: Text(
-                                            '*Debe llenar todos los campos',
-                                            style:
-                                                TextStyle(color: Colors.red)),
-                                      )
-                                    : Text(''),
-                              ]),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: double.infinity,
-                            margin: EdgeInsets.fromLTRB(35, 0, 35, 20),
-                            child: _ButtonRegister(),
-                          ),
+                          alignment: Alignment.bottomRight,
+                          child: _FabRegister(),
                         )
                       ],
                     ),
-                  ),
-                  // ),
-                ),
-                controller: shakeController,
+                    controller: shakeController),
               ),
             ),
-          ),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class _ButtonRegister extends StatelessWidget {
+class _TextFieldsEmpty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-          primary: DataSource.secondaryColor,
-          elevation: 10,
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          textStyle: TextStyle(fontSize: 20)),
-      onPressed: () => {
-        initRegister(),
-      },
+    return Container(
+      color: Colors.black,
+      margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
       child: Text(
-        'Registrar',
+        emptyFields ? '**Debe llenar todos los campos**' : '',
+        style: TextStyle(color: Colors.white),
       ),
+    );
+  }
+}
+
+class _FabRegister extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 0, 25, 0),
+      child: FloatingActionButton(
+          backgroundColor: DataSource.primaryColor,
+          child: Icon(Icons.arrow_forward, size: 30),
+          onPressed: initRegister),
     );
   }
 
@@ -227,84 +205,130 @@ class _ButtonRegister extends StatelessWidget {
 }
 
 class _EditTextPassword extends StatelessWidget {
-  BoxDecoration boxDecorationCard;
-
-  _EditTextPassword(this.boxDecorationCard);
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-      decoration: boxDecorationCard,
-      margin: EdgeInsets.fromLTRB(20, 10, 10, 10),
-      child: TextField(
-        controller: passController,
-        obscureText: true,
-        style: TextStyle(color: Colors.white, fontSize: 17),
-        decoration: InputDecoration(
-            icon: Icon(Icons.lock),
-            hintText: 'Password',
-            hintStyle: TextStyle(color: Colors.white),
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none),
-        //controller: controllerPasswd,
-      ),
-    );
+        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // decoration: boxDecorationContainer,
+        margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
+        child: TextField(
+            cursorColor: Colors.white,
+            controller: passController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                decorationColor: Colors.white),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              labelText: 'Contraseña',
+              labelStyle: TextStyle(color: Colors.white),
+              hintStyle: TextStyle(color: Colors.white),
+            )));
+  }
+}
+
+class _EditTextOtherPassword extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Container(
+        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // decoration: boxDecorationContainer,
+        margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
+        child: TextField(
+            cursorColor: Colors.white,
+            controller: passController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                decorationColor: Colors.white),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              labelText: 'Ingrese de nuevo Contraseña',
+              labelStyle: TextStyle(color: Colors.white),
+              hintStyle: TextStyle(color: Colors.white),
+            )));
   }
 }
 
 class _EditTextNameRest extends StatelessWidget {
-  BoxDecoration boxDecorationCard;
-
-  _EditTextNameRest(this.boxDecorationCard);
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-      decoration: boxDecorationCard,
-      margin: EdgeInsets.fromLTRB(20, 10, 10, 10),
-      child: TextField(
-        controller: nameRestaurantController,
-        style: TextStyle(color: Colors.white, fontSize: 17),
-        decoration: InputDecoration(
-            icon: Icon(Icons.restaurant),
-            hintText: 'Nombre de restaurante',
-            hintStyle: TextStyle(color: Colors.white),
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none),
-        //controller: controllerPasswd,
-      ),
-    );
+        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // decoration: boxDecorationContainer,
+        margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
+        child: TextField(
+            cursorColor: Colors.white,
+            controller: nameRestaurantController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                decorationColor: Colors.white),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              labelText: 'Nombre de restaurante',
+              labelStyle: TextStyle(color: Colors.white),
+              hintStyle: TextStyle(color: Colors.white),
+            )));
   }
 }
 
-class _EdittTextEmail extends StatelessWidget {
-  BoxDecoration boxDecorationCard;
-
-  _EdittTextEmail(this.boxDecorationCard);
-
+class _EditTextEmail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-      decoration: boxDecorationCard,
-      margin: EdgeInsets.fromLTRB(20, 0, 10, 10),
-      child: TextField(
-        controller: emailController,
-        keyboardType: TextInputType.emailAddress,
-        style: TextStyle(color: Colors.white, fontSize: 17),
-        decoration: InputDecoration(
-            icon: Icon(Icons.person),
-            hintText: 'Email',
-            hintStyle: TextStyle(color: Colors.white),
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none),
-      ),
-    );
+        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // decoration: boxDecorationContainer,
+        margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
+        child: TextField(
+            cursorColor: Colors.white,
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                decorationColor: Colors.white),
+            decoration: InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white, width: 1.0),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              labelText: 'Email',
+              labelStyle: TextStyle(color: Colors.white),
+              hintStyle: TextStyle(color: Colors.white),
+            )));
   }
 }
 

@@ -10,8 +10,7 @@ class ModelRegisterMVP {
 
   ModelRegisterMVP(this.presenterRegisterMVP);
 
-  void prepareModelValidateRegister(
-      String emailUser, String nameResUser, String passUser) {
+  void prepareModelValidateRegister(String emailUser, String nameResUser, String passUser) {
     if (emailUser.isNotEmpty && nameResUser.isNotEmpty && passUser.isNotEmpty) {
       presenterRegisterMVP.notifyViewShowPDialogLoading();
       BackendlessUser user = BackendlessUser();
@@ -25,9 +24,7 @@ class ModelRegisterMVP {
   }
 
   void registerUser(BackendlessUser user) {
-    Backendless.userService
-        .register(user)
-        .then((BackendlessUser backendlessUser) {
+    Backendless.userService.register(user).then((BackendlessUser backendlessUser) {
       presenterRegisterMVP.notifyViewClosePdialog();
       presenterRegisterMVP.notifyViewFinishRoute();
     }).catchError((error) {

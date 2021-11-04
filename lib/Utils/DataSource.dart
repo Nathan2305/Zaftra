@@ -1,7 +1,10 @@
 import 'dart:ui';
 
 class DataSource {
-  static final primaryColor = Color(0xFFF134DE8);
-  static final secondaryColor = Color(0xFFF429FEC);
+  static final primaryColor = Color(0xFFFED9D36);
+  static final secondaryColor = Color(0xFFFF25223);
+  static final double SIZE_HEIGHT_SMALL_DEVICE=533.34;
+  static final double SIZE_HEIGHT_VERY_SMALL_DEVICE=426.7;
+  static final double MOBILE_MAX_WIDTH=411.5;
   static final String COLUMN_NAME_RESTAURANT="nameRestaurant";
 }
