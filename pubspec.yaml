@@ -31,6 +31,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   lottie: ^1.2.1
   flutter_svg: ^0.23.0+1
+  flutter_spinkit: ^5.1.0
+  imagebutton: ^0.0.6
 
 dev_dependencies:
   flutter_test:
@@ -53,7 +55,10 @@ flutter:
     - assets/loading_icon.json
     - assets/done.json
     - assets/register_bground.png
-    - assets/register_bground_4XL.png
+    - assets/waitress.png
+    - assets/food_drinks.png
+    - assets/report.png
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - assets/a_dot_burr.jpeg

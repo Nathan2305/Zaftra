@@ -1,10 +1,9 @@
-// @dart=2.9
+//@dart=2.9
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lottie/lottie.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:test_login/Presenter/PresenterLoginMVP.dart';
 import 'package:test_login/Utils/AnimationSource.dart';
@@ -14,16 +13,13 @@ import 'package:test_login/Utils/WidgetsX.dart';
 import 'package:test_login/View/MainMenuScreen.dart';
 import 'package:test_login/View/RegisterScreen.dart';
 import 'package:test_login/View/interfaceLoginMVP.dart';
-//import 'package:universal_io/io.dart';
 
-//PresenterLoginMVP presenterLoginMVP;
-PresenterLoginMVP presenterLoginMVP; //<--- variable can be null
 final TextEditingController controllerEmail = TextEditingController();
 final TextEditingController controllerPasswd = TextEditingController();
 BuildContext fullcontext;
 ProgressDialog pDialog;
 bool isWideScreenWidth = false;
-//double aspectRatio;
+PresenterLoginMVP presenterLoginMVP;
 
 void main() {
   runApp(MyAppLoginScreen());
@@ -31,86 +27,42 @@ void main() {
 
 class MyAppLoginScreen extends StatelessWidget {
   // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: LoginScreen());
-  }
-}
 
-class LoginScreen extends StatelessWidget implements interfaceLoginMVP {
-  @override
-  Widget build(BuildContext context) {
-    fullcontext = context;
-    presenterLoginMVP = PresenterLoginMVP(LoginScreen());
-    return ResponsiveWidget(
-      mobile: MobileLayout(),
-    );
-  }
-
-  @override
-  void notifyViewShowErrorMsg(String msgError) {
-    // TODO: implement notifyViewShowErrorMsg
-    showDialogMsg(msgError, "error");
-  }
-
-  showDialogMsg(String msg, String typeMsg) {
-    AlertDialog alertDialog = WidgetsX.buildAlertDialog(msg, typeMsg);
-    showDialog(
-        context: fullcontext,
-        builder: (BuildContext context) {
-          return alertDialog;
-        });
-  }
-
-  @override
-  void notifyViewShowInfoMsg(String msgInfo) {
-    // TODO: implement notifyViewShowInfoMsg
-    showDialogMsg(msgInfo, "warning");
-  }
-
-  @override
-  void notifyViewShowLottieDialog() {
-    // TODO: implement notifyViewShowLottieDialog
-    pDialog = WidgetsX.showProgressDialog(fullcontext, "Iniciando sesión");
-    pDialog.show();
-  }
-
-  @override
-  void notifyViewCloseLottieDialog() {
-    // TODO: implement notifyViewCloseLottieDialog
-    pDialog.hide();
-  }
-
-  @override
-  void notifyViewShowSuccessFullLogin() {
-    // TODO: implement notifyViewShowSuccessFullLogin
-    showLottieDoneLogin();
-  }
-
-  void showLottieDoneLogin() => showDialog(
-      barrierDismissible: false,
-      context: fullcontext,
-      builder: (context) => Dialog(
-            child: Lottie.asset(
-              'assets/done.json',
-              repeat: false,
-              onLoaded: (composition) {
-                Navigator.of(context)
-                    .push(AnimationSource.createRoute(MainMenuScreen()));
-              },
-            ),
-          ));
-}
-
-class MobileLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    return Scaffold(
+      body: MaterialApp(
+      useInheritedMediaQuery: true,
+        initialRoute: '/login',
+        routes: {
+          // When navigating to the "/" route, build the FirstScreen widget.
+          '/login': (context) => FirstScreen(),
+          // When navigating to the "/second" route, build the SecondScreen widget.
+          '/second': (context) => MainMenuScreen(),
+        },
+      ),
+    );
+  }
+}
+
+class FirstScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return ResponsiveWidget(
+      mobile: MobileLayoutLogin(),
+    );
+  }
+}
+
+class MobileLayoutLogin extends StatelessWidget implements interfaceLoginMVP {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    fullcontext = context;
+    presenterLoginMVP = PresenterLoginMVP(MobileLayoutLogin());
     Size size = MediaQuery.of(context).size;
-    /*double aspectRatio =
-        size.height > DataSource.SIZE_HEIGHT_SMALL_DEVICE ? 1 : 1;*/
-    double sizetextForLowResolution;
-    // double aspectRatio = size.height * 0.05;
     return Scaffold(
       body: Container(
         //margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
@@ -120,22 +72,16 @@ class MobileLayout extends StatelessWidget {
             children: [
               Container(
                 height: size.height,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                      DataSource.primaryColor,
+                      DataSource.secondaryColor
+                    ])),
                 child: Stack(
                   children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        height: size.height * 0.5,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                              DataSource.primaryColor,
-                              DataSource.secondaryColor
-                            ])),
-                      ),
-                    ),
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: Card(
@@ -162,7 +108,8 @@ class MobileLayout extends StatelessWidget {
                                   ])),
                           width: size.width * 0.85,
                           //thw following height is set if screen resolution is very low
-                          height: size.height <=DataSource.SIZE_HEIGHT_VERY_SMALL_DEVICE
+                          height: size.height <=
+                                  DataSource.SIZE_HEIGHT_VERY_SMALL_DEVICE
                               ? size.height * 0.85
                               : size.height * 0.6,
                           child: Stack(
@@ -209,15 +156,45 @@ class MobileLayout extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  void notifyViewCloseLottieDialog() {
+    pDialog.hide();
+  }
+
+  @override
+  void notifyViewShowErrorMsg(String msgError) {
+    showDialogMsg(msgError, "error");
+  }
+
+  @override
+  void notifyViewShowInfoMsg(String msgInfo) {
+    showDialogMsg(msgInfo, "warning");
+  }
+
+  @override
+  void notifyViewShowLottieDialog() {
+    pDialog = WidgetsX.showProgressDialog(fullcontext, "Iniciando sesión");
+    pDialog.show();
+  }
+
+  @override
+  void notifyViewShowSuccessFullLogin() {
+    //Navigator.push(fullcontext, AnimationSource.createRoute(MainMenuScreen()));
+    Navigator.pushNamedAndRemoveUntil(fullcontext, "/second", (Route<dynamic> route) => false);
+  }
+
+  showDialogMsg(String msg, String typeMsg) {
+    AlertDialog alertDialog = WidgetsX.buildAlertDialog(msg, typeMsg);
+    showDialog(
+        context: fullcontext,
+        builder: (BuildContext context) {
+          return alertDialog;
+        });
+  }
 }
 
 class WidgetNotSmallDeviceBottom extends StatelessWidget {
-/*
-  final double aspectRatio;
-
-  WidgetNotSmallDeviceBottom(this.aspectRatio);
-*/
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -269,10 +246,6 @@ class WidgetNotSmallDeviceBottom extends StatelessWidget {
 }
 
 class WidgetSmallDeviceBottom extends StatelessWidget {
- /* final double aspectRatio;
-
-  WidgetSmallDeviceBottom(this.aspectRatio);*/
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -332,12 +305,6 @@ class WidgetSmallDeviceBottom extends StatelessWidget {
 }
 
 class _ButtonLogin extends StatelessWidget {
-/*
-  final double ratio;
-
-  _ButtonLogin(this.ratio);
-*/
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -364,10 +331,6 @@ void initLogin() {
 }
 
 class _EditTextPassword extends StatelessWidget {
- /* final double heightText;
-
-  _EditTextPassword(this.heightText);*/
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -380,7 +343,7 @@ class _EditTextPassword extends StatelessWidget {
             controller: controllerPasswd,
             obscureText: true,
             style: TextStyle(
-               // height: heightText,
+                // height: heightText,
                 color: Colors.white,
                 fontSize: 17,
                 decorationColor: Colors.white),
@@ -401,12 +364,6 @@ class _EditTextPassword extends StatelessWidget {
 }
 
 class _EditTextEmail extends StatelessWidget {
-/*
-  final double aspectRatio;
-
-  _EditTextEmail(this.aspectRatio);
-*/
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -419,7 +376,7 @@ class _EditTextEmail extends StatelessWidget {
             controller: controllerEmail,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
-               // height: aspectRatio,
+                // height: aspectRatio,
                 color: Colors.white,
                 fontSize: 17,
                 decorationColor: Colors.white),

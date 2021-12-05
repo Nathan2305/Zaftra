@@ -3,7 +3,7 @@ class interfaceRegisterMVP{
 
   void notifyViewEmptyField() {}
 
-  void notifyViewClosePdialog() {}
+  void notifyViewCloseProgressDialog() {}
 
   void notifyViewShowErrorMsg(String msgError) {}
 

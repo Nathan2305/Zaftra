@@ -1,4 +1,4 @@
-import 'package:test_login/Model/ModelRegisterMVP.dart';
+import 'package:test_login/Model/ModelRegisterAdminMVP.dart';
 import 'package:test_login/View/interfaceRegisterMVP.dart';
 
 class PresenterRegisterMVP{
@@ -8,8 +8,8 @@ class PresenterRegisterMVP{
   PresenterRegisterMVP(this._interfaceRegisterMVP){
     this.modelRegisterMVP=ModelRegisterMVP(this);
   }
-  void requestModelValidateRegister(String email,String nameRes,String pass){
-    modelRegisterMVP?.prepareModelValidateRegister(email,nameRes,pass);
+  void requestModelValidateRegister(String email,String nameAdmin,String nameRes,String pass){
+    modelRegisterMVP?.prepareModelValidateRegister(email,nameAdmin,nameRes,pass);
   }
 
   void notifyViewShowPDialogLoading() {
@@ -20,8 +20,8 @@ class PresenterRegisterMVP{
     _interfaceRegisterMVP.notifyViewEmptyField();
   }
 
-  void notifyViewClosePdialog() {
-    _interfaceRegisterMVP.notifyViewClosePdialog();
+  void notifyViewCloseProgressDialog() {
+    _interfaceRegisterMVP.notifyViewCloseProgressDialog();
   }
 
   void notifyViewShowErrorMsg(String msgError) {

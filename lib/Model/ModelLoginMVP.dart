@@ -3,6 +3,7 @@
 import 'package:flutter/services.dart';
 import 'package:test_login/Presenter/PresenterLoginMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
+import 'package:test_login/main.dart';
 
 class ModelLoginMVP {
   PresenterLoginMVP presenterLoginMVP;
@@ -21,6 +22,7 @@ class ModelLoginMVP {
     } else {
       presenterLoginMVP.notifyViewShowLottieDialog();
       Backendless.userService.login(email, passwd, true).then((BackendlessUser backendlessUser) {
+        MyAppMain.currentUser=backendlessUser;
         presenterLoginMVP.notifyViewCloseLottieDialog();
         presenterLoginMVP.notifyViewShowSuccessFullLogin();
       }).catchError((error) {

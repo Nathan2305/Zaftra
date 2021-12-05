@@ -7,21 +7,23 @@ import 'package:test_login/Utils/DataSource.dart';
 import 'package:test_login/Utils/ResponsiveWidget.dart';
 import 'package:test_login/Utils/ShakeView.dart';
 import 'package:test_login/Utils/WidgetsX.dart';
-import 'package:test_login/View/LoginScreen.dart';
 import 'package:test_login/View/interfaceRegisterMVP.dart';
 
 TextEditingController emailController;
 TextEditingController nameRestaurantController;
 TextEditingController passController;
+TextEditingController nameAdminController;
 PresenterRegisterMVP presenterRegisterMVP;
 
-ProgressDialog ploading;
-BuildContext fullctx;
+ProgressDialog progressLoading;
+BuildContext fullContext;
 bool emptyFields;
-ShakeController shakeController;
+//ShakeController shakeController;
 AlertDialog alertDialog;
 bool isVerySmall = false;
 Size size;
+TextStyle textStyle;
+OutlineInputBorder outlineInputBorder;
 
 void main() {
   runApp(Register());
@@ -38,15 +40,21 @@ class _Register extends State<Register>
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    fullctx = context;
+    textStyle = TextStyle(
+        color: Colors.white, fontSize: 17, decorationColor: Colors.white);
+    outlineInputBorder = OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.white, width: 1.0),
+        borderRadius: BorderRadius.circular(15));
+    fullContext = context;
     presenterRegisterMVP = PresenterRegisterMVP(this);
     return MaterialApp(
+      useInheritedMediaQuery: true,
       home: Scaffold(
-        //extendBodyBehindAppBar: true,
+          //extendBodyBehindAppBar: true,
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
-            title: Text('Registro'),
-            backgroundColor:DataSource.secondaryColor,
+            title: Text('Registro de administrador'),
+            backgroundColor: DataSource.secondaryColor,
           ),
           body: ResponsiveWidget(
             mobile: MobileLayout(),
@@ -68,9 +76,10 @@ class _Register extends State<Register>
     // TODO: implement initState
     emptyFields = false;
     emailController = TextEditingController();
+    nameAdminController = TextEditingController();
     nameRestaurantController = TextEditingController();
     passController = TextEditingController();
-    shakeController = ShakeController(vsync: this);
+    //shakeController = ShakeController(vsync: this);
     super.initState();
   }
 
@@ -80,7 +89,7 @@ class _Register extends State<Register>
     setState(() {
       emptyFields = true;
     });
-    shakeController.shake();
+    //shakeController.shake();
   }
 
   @override
@@ -91,14 +100,15 @@ class _Register extends State<Register>
         emptyFields = false;
       });
     }
-    ploading = WidgetsX.showProgressDialog(fullctx, "Registrando");
-    ploading.show();
+    progressLoading =
+        WidgetsX.showProgressDialog(fullContext, "Registrando...");
+    progressLoading.show();
   }
 
   @override
-  void notifyViewClosePdialog() {
+  void notifyViewCloseProgressDialog() {
     // TODO: implement notifyViewClosePdialog
-    ploading.hide();
+    progressLoading.hide();
   }
 
   @override
@@ -143,12 +153,29 @@ class MobileLayout extends StatelessWidget {
           children: [
             Align(
               child: SingleChildScrollView(
-                child: ShakeView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _TextFieldsEmpty(),
+                    _EditTextEmail(),
+                    _EditTextNameAdmin(),
+                    //_EditTextLastNameAdmin(),
+                    _EditTextNameRest(),
+                    _EditTextPassword(),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: _FabRegister(),
+                    )
+                  ],
+                ),
+                /*child: ShakeView(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         _TextFieldsEmpty(),
                         _EditTextEmail(),
+                        _EditTextNameAdmin(),
+                        //_EditTextLastNameAdmin(),
                         _EditTextNameRest(),
                         _EditTextPassword(),
                         Align(
@@ -157,7 +184,7 @@ class MobileLayout extends StatelessWidget {
                         )
                       ],
                     ),
-                    controller: shakeController),
+                    controller: shakeController),*/
               ),
             ),
           ],
@@ -187,24 +214,40 @@ class _FabRegister extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 0, 25, 0),
-      child: FloatingActionButton(
-          backgroundColor: DataSource.primaryColor,
-          child: Icon(Icons.arrow_forward, size: 30),
-          onPressed: initRegister),
+      margin: EdgeInsets.only(top: 15, right: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            margin: EdgeInsets.only(right: 10),
+            child: Text(
+              'Registrar',
+              textScaleFactor: 1.5,
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          FloatingActionButton(
+              backgroundColor: DataSource.primaryColor,
+              child: Icon(Icons.arrow_forward, size: 30),
+              onPressed: initRegister),
+        ],
+      ),
     );
   }
 
   initRegister() {
-    String emailtxt = emailController.text;
-    String nameRestxt = nameRestaurantController.text;
-    String passtxt = passController.text;
+    String emailTxt = emailController.text;
+    String nameAdminTxt = nameAdminController.text;
+    String nameResTxt = nameRestaurantController.text;
+    String passTxt = passController.text;
     presenterRegisterMVP.requestModelValidateRegister(
-        emailtxt, nameRestxt, passtxt);
+        emailTxt, nameAdminTxt, nameResTxt, passTxt);
   }
 }
 
 class _EditTextPassword extends StatelessWidget {
+  final Color color=emptyFields && passController.text.isEmpty? Colors.red:Colors.white;
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -213,30 +256,24 @@ class _EditTextPassword extends StatelessWidget {
         // decoration: boxDecorationContainer,
         margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
         child: TextField(
+            obscureText: true,
             cursorColor: Colors.white,
             controller: passController,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                decorationColor: Colors.white),
+            style: textStyle,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
+              focusedBorder: outlineInputBorder,
+              enabledBorder: outlineInputBorder,
               labelText: 'Contraseña',
-              labelStyle: TextStyle(color: Colors.white),
-              hintStyle: TextStyle(color: Colors.white),
+              labelStyle: TextStyle(color: color),
             )));
   }
 }
 
-class _EditTextOtherPassword extends StatelessWidget {
+class _EditTextNameAdmin extends StatelessWidget {
+
+  final Color color=emptyFields && nameAdminController.text.isEmpty? Colors.red:Colors.white;
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -246,29 +283,21 @@ class _EditTextOtherPassword extends StatelessWidget {
         margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
         child: TextField(
             cursorColor: Colors.white,
-            controller: passController,
+            controller: nameAdminController,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                decorationColor: Colors.white),
+            style: textStyle,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              labelText: 'Ingrese de nuevo Contraseña',
-              labelStyle: TextStyle(color: Colors.white),
-              hintStyle: TextStyle(color: Colors.white),
+              focusedBorder: outlineInputBorder,
+              enabledBorder: outlineInputBorder,
+              labelText: 'Nombre',
+              labelStyle: TextStyle(color: color),
             )));
   }
 }
 
 class _EditTextNameRest extends StatelessWidget {
+  final Color color=emptyFields && nameRestaurantController.text.isEmpty? Colors.red:Colors.white;
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -280,55 +309,35 @@ class _EditTextNameRest extends StatelessWidget {
             cursorColor: Colors.white,
             controller: nameRestaurantController,
             keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                decorationColor: Colors.white),
+            style: textStyle,
             decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
+              focusedBorder: outlineInputBorder,
+              enabledBorder: outlineInputBorder,
               labelText: 'Nombre de restaurante',
-              labelStyle: TextStyle(color: Colors.white),
-              hintStyle: TextStyle(color: Colors.white),
+              labelStyle: TextStyle(color: color),
             )));
   }
 }
 
 class _EditTextEmail extends StatelessWidget {
+ final Color color=emptyFields && emailController.text.isEmpty? Colors.red:Colors.white;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-        //padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-        // decoration: boxDecorationContainer,
-        margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
-        child: TextField(
-            cursorColor: Colors.white,
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                decorationColor: Colors.white),
-            decoration: InputDecoration(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 1.0),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              labelText: 'Email',
-              labelStyle: TextStyle(color: Colors.white),
-              hintStyle: TextStyle(color: Colors.white),
-            )));
+      margin: EdgeInsets.fromLTRB(25, 0, 25, 10),
+      child: TextField(
+          cursorColor: Colors.white,
+          controller: emailController,
+          keyboardType: TextInputType.emailAddress,
+          style: textStyle,
+          decoration: InputDecoration(
+            focusedBorder: outlineInputBorder,
+            enabledBorder: outlineInputBorder,
+            labelText: 'Email',
+            labelStyle: TextStyle(color: color),
+          )),
+    );
   }
 }
 

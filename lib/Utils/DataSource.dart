@@ -7,4 +7,7 @@ class DataSource {
   static final double SIZE_HEIGHT_VERY_SMALL_DEVICE=426.7;
   static final double MOBILE_MAX_WIDTH=411.5;
   static final String COLUMN_NAME_RESTAURANT="nameRestaurant";
+  static final String COLUMN_PROFILE="profile";
+  static final String COLUMN_NAME="name";
+
 }

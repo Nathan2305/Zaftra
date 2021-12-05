@@ -10,13 +10,15 @@ class ModelRegisterMVP {
 
   ModelRegisterMVP(this.presenterRegisterMVP);
 
-  void prepareModelValidateRegister(String emailUser, String nameResUser, String passUser) {
-    if (emailUser.isNotEmpty && nameResUser.isNotEmpty && passUser.isNotEmpty) {
+  void prepareModelValidateRegister(String emailUser,String nameAdmin, String nameResUser, String passUser) {
+    if (emailUser.isNotEmpty && nameAdmin.isNotEmpty && nameResUser.isNotEmpty && passUser.isNotEmpty) {
       presenterRegisterMVP.notifyViewShowPDialogLoading();
       BackendlessUser user = BackendlessUser();
       user.email = emailUser;
       user.password = passUser;
+      user.setProperty(DataSource.COLUMN_PROFILE, "admin");
       user.setProperty(DataSource.COLUMN_NAME_RESTAURANT, nameResUser);
+      user.setProperty(DataSource.COLUMN_NAME, nameAdmin);
       registerUser(user);
     } else {
       presenterRegisterMVP.notifyViewEmptyField();
@@ -25,12 +27,12 @@ class ModelRegisterMVP {
 
   void registerUser(BackendlessUser user) {
     Backendless.userService.register(user).then((BackendlessUser backendlessUser) {
-      presenterRegisterMVP.notifyViewClosePdialog();
+      presenterRegisterMVP.notifyViewCloseProgressDialog();
       presenterRegisterMVP.notifyViewFinishRoute();
     }).catchError((error) {
       PlatformException exception = error;
-      String msgError = "Error registrando usuario: " + exception.message;
-      presenterRegisterMVP.notifyViewClosePdialog();
+      String msgError = 'Error registrando usuario: $exception.message';
+      presenterRegisterMVP.notifyViewCloseProgressDialog();
       presenterRegisterMVP.notifyViewShowErrorMsg(msgError);
     });
   }
