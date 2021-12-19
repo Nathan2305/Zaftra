@@ -9,5 +9,6 @@ class DataSource {
   static final String COLUMN_NAME_RESTAURANT="nameRestaurant";
   static final String COLUMN_PROFILE="profile";
   static final String COLUMN_NAME="name";
+  static final String COLUMN_LAST_NAME="lastName";
 
 }

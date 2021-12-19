@@ -10,8 +10,10 @@ import 'package:test_login/View/LoginScreen.dart';
 import 'package:test_login/View/MainMenuScreen.dart';
 
 import 'Utils/DataSource.dart';
+import 'main.reflectable.dart';
 
 void main() {
+  initializeReflectable();
   runApp(MyAppMain());
 }
 

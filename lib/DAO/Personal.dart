@@ -1,3 +1,6 @@
+import 'package:backendless_sdk/backendless_sdk.dart';
+
+@reflector
 class Personal{
   String objectId;
   String name;
@@ -5,15 +8,15 @@ class Personal{
 
   Personal(this.objectId,this.name,this.lastName);
 
-  String get namePersonal{
+  String get getNamePersonal{
     return name;
   }
 
-  String get objectIdPersonal{
+  String get getObjectIdPersonal{
     return objectId;
   }
 
-  String get lastNamePersonal{
+  String get getLastNamePersonal{
     return lastName;
   }
 

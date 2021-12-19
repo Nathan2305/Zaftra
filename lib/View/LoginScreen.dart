@@ -16,7 +16,7 @@ import 'package:test_login/View/interfaceLoginMVP.dart';
 
 final TextEditingController controllerEmail = TextEditingController();
 final TextEditingController controllerPasswd = TextEditingController();
-BuildContext fullcontext;
+BuildContext fullContext;
 ProgressDialog pDialog;
 bool isWideScreenWidth = false;
 PresenterLoginMVP presenterLoginMVP;
@@ -31,127 +31,128 @@ class MyAppLoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      body: MaterialApp(
+    return MaterialApp(
       useInheritedMediaQuery: true,
-        initialRoute: '/login',
-        routes: {
-          // When navigating to the "/" route, build the FirstScreen widget.
-          '/login': (context) => FirstScreen(),
-          // When navigating to the "/second" route, build the SecondScreen widget.
-          '/second': (context) => MainMenuScreen(),
-        },
+      initialRoute: '/login',
+      // routes: {
+      //   // When navigating to the "/" route, build the FirstScreen widget.
+      //   '/login': (context) => FirstScreen(),
+      //   // When navigating to the "/second" route, build the SecondScreen widget.
+      //   '/second': (context) => MainMenuScreen(),
+      // },
+      home: Scaffold(
+        body: ResponsiveWidget(
+          mobile: MobileLayoutLogin(),
+        ),
       ),
     );
   }
 }
 
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return ResponsiveWidget(
-      mobile: MobileLayoutLogin(),
-    );
-  }
-}
+// class FirstScreen extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     // TODO: implement build
+//     return ResponsiveWidget(
+//       mobile: MobileLayoutLogin(),
+//     );
+//   }
+// }
 
 class MobileLayoutLogin extends StatelessWidget implements interfaceLoginMVP {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    fullcontext = context;
+    fullContext = context;
     presenterLoginMVP = PresenterLoginMVP(MobileLayoutLogin());
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Container(
-        //margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: size.height,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                      DataSource.primaryColor,
-                      DataSource.secondaryColor
-                    ])),
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                        elevation: 10,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black54,
-                                  blurRadius: 10.0,
-                                ),
-                              ],
-                              borderRadius: BorderRadius.circular(15),
-                              gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    DataSource.primaryColor,
-                                    DataSource.secondaryColor
-                                  ])),
-                          width: size.width * 0.85,
-                          //thw following height is set if screen resolution is very low
-                          height: size.height <=
-                                  DataSource.SIZE_HEIGHT_VERY_SMALL_DEVICE
-                              ? size.height * 0.85
-                              : size.height * 0.6,
-                          child: Stack(
-                            children: [
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: Container(
-                                  margin: EdgeInsets.all(10),
-                                  child: Text(
-                                    "Iniciar sesión",
-                                    textScaleFactor: 2.2,
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
+    return Container(
+      //margin: EdgeInsets.fromLTRB(0, 25, 0, 0),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: size.height,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                    DataSource.primaryColor,
+                    DataSource.secondaryColor
+                  ])),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      elevation: 10,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black54,
+                                blurRadius: 10.0,
                               ),
-                              Align(
-                                alignment: Alignment.center,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    _EditTextEmail(),
-                                    _EditTextPassword(),
-                                  ],
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.bottomCenter,
-                                child: size.height <=
-                                        DataSource.SIZE_HEIGHT_SMALL_DEVICE
-                                    ? WidgetSmallDeviceBottom()
-                                    : WidgetNotSmallDeviceBottom(),
-                              )
                             ],
-                          ),
+                            borderRadius: BorderRadius.circular(15),
+                            gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  DataSource.primaryColor,
+                                  DataSource.secondaryColor
+                                ])),
+                        width: size.width * 0.85,
+                        //thw following height is set if screen resolution is very low
+                        height: size.height <=
+                                DataSource.SIZE_HEIGHT_VERY_SMALL_DEVICE
+                            ? size.height * 0.85
+                            : size.height * 0.6,
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                margin: EdgeInsets.all(10),
+                                child: Text(
+                                  "Iniciar sesión",
+                                  textScaleFactor: 2.2,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _EditTextEmail(),
+                                  _EditTextPassword(),
+                                ],
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.bottomCenter,
+                              child: size.height <=
+                                      DataSource.SIZE_HEIGHT_SMALL_DEVICE
+                                  ? WidgetSmallDeviceBottom()
+                                  : WidgetNotSmallDeviceBottom(),
+                            )
+                          ],
                         ),
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -174,20 +175,24 @@ class MobileLayoutLogin extends StatelessWidget implements interfaceLoginMVP {
 
   @override
   void notifyViewShowLottieDialog() {
-    pDialog = WidgetsX.showProgressDialog(fullcontext, "Iniciando sesión");
+    pDialog = WidgetsX.showProgressDialog(fullContext, "Iniciando sesión");
     pDialog.show();
   }
 
   @override
   void notifyViewShowSuccessFullLogin() {
-    //Navigator.push(fullcontext, AnimationSource.createRoute(MainMenuScreen()));
-    Navigator.pushNamedAndRemoveUntil(fullcontext, "/second", (Route<dynamic> route) => false);
+    //Navigator.push(fullContext, AnimationSource.createRoute(MainMenuScreen()));
+    // Navigator.pushNamedAndRemoveUntil(fullContext, "/second", (Route<dynamic> route) => false);
+    Navigator.pushAndRemoveUntil(
+        fullContext,
+        AnimationSource.createRoute(MainMenuScreen()),
+        (Route<dynamic> route) => false);
   }
 
   showDialogMsg(String msg, String typeMsg) {
     AlertDialog alertDialog = WidgetsX.buildAlertDialog(msg, typeMsg);
     showDialog(
-        context: fullcontext,
+        context: fullContext,
         builder: (BuildContext context) {
           return alertDialog;
         });

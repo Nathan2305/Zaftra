@@ -23,7 +23,7 @@ class MainMenuScreen extends StatefulWidget {
 class StateMainMenuScreen extends State<MainMenuScreen>
     with SingleTickerProviderStateMixin
     implements interfaceMainMenuMVP {
-  bool closeSession = false;
+ // bool closeSession = false;
 
   late PresenterMainMenuMVP presenterMainMenuMVP;
   late final controller =
