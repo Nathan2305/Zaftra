@@ -2,12 +2,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:sizer/sizer.dart';
 import 'package:test_login/Presenter/PresenterRegisterMVP.dart';
 import 'package:test_login/Utils/DataSource.dart';
 import 'package:test_login/Utils/ResponsiveWidget.dart';
-import 'package:test_login/Utils/ShakeView.dart';
 import 'package:test_login/Utils/WidgetsX.dart';
-import 'package:test_login/View/interfaceRegisterMVP.dart';
+import 'package:test_login/View/Interfaces/interfaceRegisterMVP.dart';
 
 TextEditingController emailController;
 TextEditingController nameRestaurantController;
@@ -101,7 +101,7 @@ class _Register extends State<Register>
       });
     }
     progressLoading =
-        WidgetsX.showProgressDialog(fullContext, "Registrando...");
+        WidgetsX.showProgressDialog(fullContext, "Registrando...",5.sp);
     progressLoading.show();
   }
 
@@ -118,7 +118,7 @@ class _Register extends State<Register>
   }
 
   showDialogMsg(String msg, String typeMsg) {
-    AlertDialog alertDialog = WidgetsX.buildAlertDialog(msg, typeMsg);
+    AlertDialog alertDialog = WidgetsX.buildAlertDialog(msg, typeMsg,5.sp);
     showDialog(
         context: context,
         builder: (BuildContext context) {

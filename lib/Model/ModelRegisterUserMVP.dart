@@ -10,11 +10,14 @@ class ModelRegisterUserMVP {
 
   void prepareModelRegisterUser(String name, String lastName, String email) {
     if (name.isNotEmpty && lastName.isNotEmpty && email.isNotEmpty) {
+      presenterRegisterUserMVP.notifyViewStartLoading();
       registerUser(name, lastName, email);
+    }else{
+      presenterRegisterUserMVP.notifyViewEmptyFields();
     }
   }
 
-  void registerUser(String name, String lastName, String email) async{
+  Future<void> registerUser(String name, String lastName, String email) async{
     BackendlessUser backendlessUser = BackendlessUser();
     backendlessUser.email = email;
     backendlessUser.password = 'restaurant123';
@@ -25,10 +28,10 @@ class ModelRegisterUserMVP {
     BackendlessUser? newUser= await Backendless.userService.register(backendlessUser).catchError((error) {
       PlatformException exception = error;
       String msgError = 'Error registrando nuevo usuario: ${exception.message}';
-      //presenterRegisterUserMVP.notifyViewShowMsgError(msgError);
+      presenterRegisterUserMVP.notifyViewShowMsgError(msgError);
     });
     if(newUser!=null){
-      print('new user registered');
+     presenterRegisterUserMVP.notifyViewSuccessfulUserCreated(newUser);
     }
   }
 }

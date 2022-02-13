@@ -1,5 +1,6 @@
 import 'package:test_login/Model/ModelRegisterAdminMVP.dart';
-import 'package:test_login/View/interfaceRegisterMVP.dart';
+
+import '../View/Interfaces/interfaceRegisterMVP.dart';
 
 class PresenterRegisterMVP{
   interfaceRegisterMVP _interfaceRegisterMVP;

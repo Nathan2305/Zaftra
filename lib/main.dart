@@ -1,61 +1,87 @@
 // @dart=2.9
-import 'dart:collection';
-
+import 'dart:async';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:test_login/View/LoginScreen.dart';
-import 'package:test_login/View/MainMenuScreen.dart';
-
+import 'package:test_login/View/MobileDesign/LoginScreen.dart';
+import 'package:test_login/View/MobileDesign/MainMenuScreen.dart';
+import 'package:test_login/View/WebDesign/LoginLayoutWeb.dart';
 import 'Utils/DataSource.dart';
+import 'View/WebDesign/ValidateUserSession.dart';
 import 'main.reflectable.dart';
+import 'package:sizer/sizer.dart';
+import 'dart:math';
 
 void main() {
   initializeReflectable();
+
   runApp(MyAppMain());
 }
 
-class MyAppMain extends StatefulWidget {
+class MyAppMain extends StatelessWidget {
   static BackendlessUser currentUser;
-
-  // This widget is the root of your application.
-  @override
-  _MyAppMain createState() => _MyAppMain();
-}
-
-class _MyAppMain extends State<MyAppMain> with TickerProviderStateMixin {
-  bool userAlreadyLoggedIn = false;
-  bool finishValidate = false;
-  @override
-  void initState() {
-   Backendless.initApp(
-        applicationId: "C53D7BF1-EC61-A11B-FF18-31BAED0CB500",
-        androidApiKey: "DB303CEE-4604-43D7-8FE6-D8ACA6B45FF5",
-        iosApiKey: "C8E9E135-C284-49C9-BFFC-CC95F85705A1");
-    validateUserLoggedIn();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    //controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
+    Backendless.initApp(
+        applicationId: "C53D7BF1-EC61-A11B-FF18-31BAED0CB500",
+        androidApiKey: "DB303CEE-4604-43D7-8FE6-D8ACA6B45FF5",
+        iosApiKey: "C8E9E135-C284-49C9-BFFC-CC95F85705A1",
+        jsApiKey: "66764F86-1F2A-4973-B40B-99DF2966E19E");
     // TODO: implement builds
-    return MaterialApp(
-      home: Scaffold(
-          body: !finishValidate
-              ? SpinkitLoadingScreen()
-              : userAlreadyLoggedIn
-                  ? MainMenuScreen()
-                  : MyAppLoginScreen()),
-    );
+    return Sizer(builder: (context, orientation, deviceType) {
+      bool isWeb = deviceType == DeviceType.web;
+      return MaterialApp(
+          home: Scaffold(
+        body: isWeb ? ValidateUserSession() : StateMainWidget(),
+        backgroundColor: Colors.white,
+      ));
+    });
+  }
+}
+
+class StateMainWidget extends StatefulWidget {
+  _AnimationWidget createState() => _AnimationWidget();
+}
+
+class _AnimationWidget extends State<StateMainWidget>
+    with SingleTickerProviderStateMixin {
+  bool changeAsset = false;
+  int positionAssetChosen = 0;
+  bool userAlreadyLoggedIn = false;
+  bool finishValidateUser = false;
+  final _animationDuration = Duration(milliseconds: 130);
+  Timer _timer;
+  var assetVariable;
+  bool firstImage = true;
+  double verticalDrag = 90;
+  double horizontalDrag = 90;
+  Timer _timer2;
+  var assetArray = {
+    'assets/anticucho.png',
+    'assets/caldo_gallina.png',
+    'assets/salchipapa.jpg',
+    'assets/lomo.png',
+    'assets/ceviche.jpg'
+  };
+
+  void _changeAsset() {
+    if (!finishValidateUser) {
+      setState(() {
+        verticalDrag = verticalDrag - 18;
+        if (verticalDrag % 180 == 0) {
+          if (firstImage) {
+            firstImage = false;
+          }
+          assetVariable = setOtherAsset();
+        }
+      });
+    } else {
+      _timer.cancel();
+      _timer2 = Timer.periodic(
+          Duration(milliseconds: 70), (timer) => initLoginOrMainMenu());
+    }
   }
 
   Future<void> validateUserLoggedIn() async {
@@ -64,12 +90,8 @@ class _MyAppMain extends State<MyAppMain> with TickerProviderStateMixin {
     String objectId =
         await Backendless.userService.loggedInUser().catchError((onError) {
       PlatformException exception = onError;
+      finishValidateUser = true;
       msgError = 'Error obteniendo sesión de usuario:" $exception';
-      setState(() {
-        userAlreadyLoggedIn = false;
-        finishValidate = true;
-      });
-      //WORKS LATER HERE....
     });
     if (objectId != null && objectId.isNotEmpty) {
       mapUser = await Backendless.data
@@ -78,56 +100,234 @@ class _MyAppMain extends State<MyAppMain> with TickerProviderStateMixin {
           .catchError((onError) {
         PlatformException exception = onError;
         msgError = 'Error obteniendo sesión de usuario:" $exception';
-        setState(() {
-          userAlreadyLoggedIn = false;
-          finishValidate = true;
-        });
       });
-    } else {
-      Future.delayed(
-          Duration(seconds: 3),
-          () => setState(() {
-                userAlreadyLoggedIn = false;
-                finishValidate = true;
-              }));
+      if (mapUser != null) {
+        MyAppMain.currentUser = BackendlessUser.fromJson(mapUser);
+        userAlreadyLoggedIn = true;
+      }
     }
-    if (mapUser != null) {
-      MyAppMain.currentUser = BackendlessUser.fromJson(mapUser);
-      Future.delayed(
-          Duration(seconds: 3),
-          () => setState(() {
-                userAlreadyLoggedIn = true;
-                finishValidate = true;
-              }));
-    }
+    finishValidateUser = true;
   }
-}
 
-class SpinkitLoadingScreen extends StatelessWidget {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Backendless.initApp(
+        applicationId: "C53D7BF1-EC61-A11B-FF18-31BAED0CB500",
+        androidApiKey: "DB303CEE-4604-43D7-8FE6-D8ACA6B45FF5",
+        iosApiKey: "C8E9E135-C284-49C9-BFFC-CC95F85705A1");
+    Future.delayed(Duration(seconds: 2)).then((value) => {
+          _timer =
+              Timer.periodic(_animationDuration, (timer) => _changeAsset()),
+        });
+  }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _timer.cancel();
+    _timer2.cancel();
+  }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Center(
-      child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SpinKitSpinningLines(
-                  lineWidth: 3,
-                  size: MediaQuery.of(context).size.height * 0.2,
-                  color: DataSource.primaryColor,
-                  duration:Duration(seconds: 2)),
-              Container(
-                margin: EdgeInsets.all(25),
-                child: Text(
-                  'Cargando...',
-                  style: TextStyle(color: DataSource.primaryColor, fontSize: 20),
+      child: !finishValidateUser
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                          Expanded(
+                            child: Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()
+                                ..setEntry(3, 2, 0.002)
+                                ..rotateY(verticalDrag / 180 * pi),
+                              child: Container(
+                                width: 20.w,
+                                height: 20.w,
+                                color: Colors.white,
+                              ),
+                            ),
+                            flex: 1,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    // border:  Border.all(width: 1.0, color: Colors.red),
+                    //borderRadius: BorderRadius.all(Radius.circular(20)),
+                    image: DecorationImage(
+                        image: AssetImage(firstImage
+                            ? assetArray.elementAt(0)
+                            : assetVariable),
+                        fit: BoxFit.fill),
+                  ),
                 ),
-          ),
-        ],
-      )),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: Text('Cargando...',
+                      style: TextStyle(
+                          color: DataSource.primaryColor, fontSize: 8.w)),
+                )
+              ],
+            )
+          : Transform(
+              alignment: Alignment.center,
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.002)
+                ..rotateY(horizontalDrag / 180 * pi),
+              child:
+                  !userAlreadyLoggedIn ? MyAppLoginScreen() : MainMenuAdmin()),
     );
+  }
+
+  String setOtherAsset() {
+    positionAssetChosen++;
+    if (positionAssetChosen == assetArray.length) {
+      validateUserLoggedIn();
+      positionAssetChosen = 0;
+    }
+    return assetArray.elementAt(positionAssetChosen);
+  }
+
+  initLoginOrMainMenu() {
+    setState(() {
+      horizontalDrag = horizontalDrag - 18;
+      if (horizontalDrag == 0) {
+        _timer2.cancel();
+      }
+    });
   }
 }

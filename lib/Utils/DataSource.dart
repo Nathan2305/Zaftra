@@ -10,5 +10,6 @@ class DataSource {
   static final String COLUMN_PROFILE="profile";
   static final String COLUMN_NAME="name";
   static final String COLUMN_LAST_NAME="lastName";
+  static final String COLUMN_PHOTO_USER_URL="photoUrl";
 
 }

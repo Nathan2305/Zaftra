@@ -9,10 +9,11 @@ class ModelLoginMVP {
   PresenterLoginMVP presenterLoginMVP;
 
   ModelLoginMVP(this.presenterLoginMVP) {
-    Backendless.initApp(
+   /* Backendless.initApp(
         applicationId: "C53D7BF1-EC61-A11B-FF18-31BAED0CB500",
         androidApiKey: "DB303CEE-4604-43D7-8FE6-D8ACA6B45FF5",
-        iosApiKey: "C8E9E135-C284-49C9-BFFC-CC95F85705A1");
+        iosApiKey: "C8E9E135-C284-49C9-BFFC-CC95F85705A1",
+        jsApiKey: "66764F86-1F2A-4973-B40B-99DF2966E19E");*/
   }
 
   void prepareModelValidateLogin(String email, String passwd) {
@@ -21,8 +22,10 @@ class ModelLoginMVP {
       presenterLoginMVP.notifyViewShowInfoMsg(msgInfo);
     } else {
       presenterLoginMVP.notifyViewShowLottieDialog();
-      Backendless.userService.login(email, passwd, true).then((BackendlessUser backendlessUser) {
-        MyAppMain.currentUser=backendlessUser;
+      Backendless.userService
+          .login(email, passwd, true)
+          .then((BackendlessUser backendlessUser) {
+        MyAppMain.currentUser = backendlessUser;
         presenterLoginMVP.notifyViewCloseLottieDialog();
         presenterLoginMVP.notifyViewShowSuccessFullLogin();
       }).catchError((error) {

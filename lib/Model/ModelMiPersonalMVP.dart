@@ -5,13 +5,19 @@ import 'package:flutter/services.dart';
 import 'package:test_login/DAO/Personal.dart';
 import 'package:test_login/Presenter/PresenterMiPersonalMVP.dart';
 
+import '../main.dart';
+
 class ModelMiPersonalMVP {
   PresenterMiPersonalMVP presenterMiPersonalMVP;
 
   ModelMiPersonalMVP(this.presenterMiPersonalMVP);
 
-  void prepareModelLoadPersonal() async{
-    List<Personal> listPersonal= await Backendless.data.withClass<Personal>().find().catchError((error) {
+  Future<void> prepareModelLoadPersonal() async{
+      DataQueryBuilder dataQueryBuilder=DataQueryBuilder();
+      var ownerId=MyAppMain.currentUser.getObjectId();
+      var myEmail=MyAppMain.currentUser.email;
+      dataQueryBuilder..whereClause="ownerId='${ownerId}' and email!='${myEmail}'";
+      List<BackendlessUser> listPersonal= await Backendless.data.withClass<BackendlessUser>().find(dataQueryBuilder).catchError((error) {
       PlatformException exception = error;
       String msgError = 'Error cargando trabajadores: ${exception.message}';
       presenterMiPersonalMVP.notifyViewShowMsgError(msgError);

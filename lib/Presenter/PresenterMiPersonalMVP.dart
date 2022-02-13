@@ -1,8 +1,9 @@
 //@dart=2.9
 
+import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:test_login/DAO/Personal.dart';
 import 'package:test_login/Model/ModelMiPersonalMVP.dart';
-import 'package:test_login/View/interfaceMiPersonalMVP.dart';
+import 'package:test_login/View/Interfaces/interfaceMiPersonalMVP.dart';
 
 class PresenterMiPersonalMVP{
 
@@ -17,7 +18,7 @@ class PresenterMiPersonalMVP{
     modelMiPersonalMVP.prepareModelLoadPersonal();
   }
 
-  void notifyViewShowListPersonal(List<Personal> listPersonal) {
+  void notifyViewShowListPersonal(List<BackendlessUser> listPersonal) {
     _interfaceMiPersonalMVP.notifyViewShowListPersonal(listPersonal);
   }
 
