@@ -52,6 +52,17 @@ class Methods {
     return userLoggedIn;
   }
 
+
+  static bool hasItems(List<Object> list){
+    return list!=null && list.isNotEmpty;
+
+  }
+
+  static concatenateAttrs(BackendlessUser user, String column_name, String column_last_name) {
+    if(user!=null){
+      return user.getProperty(column_name).toString() +" "+user.getProperty(column_last_name).toString();
+    }
+  }
 }
 
 

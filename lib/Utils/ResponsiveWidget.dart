@@ -2,7 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:test_login/Utils/DataSource.dart';
+import 'package:RestaurantAdmin/Utils/DataSource.dart';
 
 class ResponsiveWidget extends StatelessWidget {
   final Widget mobile;

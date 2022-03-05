@@ -1,19 +1,22 @@
 //@dart=2.9
 
 import 'dart:async';
+
+//import 'dart:html';
 import 'dart:io';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:test_login/Presenter/PresenterRegisterUserMVP.dart';
-import 'package:test_login/Utils/DataSource.dart';
-import 'package:test_login/Utils/ResponsiveWidget.dart';
-import 'package:test_login/Utils/WidgetsX.dart';
-import 'package:test_login/View/Interfaces/interfaceRegisterUserMVP.dart';
-import 'package:test_login/main.dart';
+import 'package:RestaurantAdmin/Presenter/PresenterRegisterUserMVP.dart';
+import 'package:RestaurantAdmin/Utils/DataSource.dart';
+import 'package:RestaurantAdmin/Utils/ResponsiveWidget.dart';
+import 'package:RestaurantAdmin/Utils/WidgetsX.dart';
+import 'package:RestaurantAdmin/View/Interfaces/interfaceRegisterUserMVP.dart';
+import 'package:RestaurantAdmin/main.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:sizer/sizer.dart';
+import 'dart:ui' as ui;
 import 'UserCreatedDetails.dart';
 
 void main() {
@@ -28,6 +31,7 @@ TextEditingController textEditingControllerLastName;
 BuildContext builderAlertDialogCtx;
 String emailDomain = "";
 PresenterRegisterUserMVP presenterRegisterUserMVP;
+List<BackendlessUser> listWorkers;
 
 class RegisterNewPersonalScreen extends StatelessWidget {
   RegisterNewPersonalScreen();
@@ -49,19 +53,20 @@ class RegisterNewPersonalScreen extends StatelessWidget {
     }
     emailDomain = '@' + emailDomain + '.com';
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: Text('Nuevo personal',
-              style: TextStyle(fontSize: 22, color: Colors.white))),
-      body: ResponsiveWidget(
-        mobile: MobileLayoutRegisterNewPersonal(),
-      ),
+    return Sizer(
+      builder: (BuildContext context, Orientation orientation,
+          DeviceType deviceType) {
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+              centerTitle: true,
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              title: Text('Nuevo personal',
+                  style: TextStyle(fontSize: 18.sp, color: Colors.white))),
+          body: MobileLayoutRegisterNewPersonal(),
+        );
+      },
     );
   }
 }
@@ -72,10 +77,13 @@ class MobileLayoutRegisterNewPersonal extends StatefulWidget {
 
 class _MobileLayoutStaFulWidget extends State<MobileLayoutRegisterNewPersonal>
     implements interfaceRegisterUserMVP {
-  BuildContext contexAlertCamera;
+  BuildContext contextAlertCamera;
+  bool showLoadingProgress = false;
+  var opacity = 1.0;
 
-  bool userSuccessfulCreated = false;
-  File pickedImage;
+  //bool userSuccessfulCreated = false;
+
+  //File pickedImage;
 
   @override
   void initState() {
@@ -98,146 +106,120 @@ class _MobileLayoutStaFulWidget extends State<MobileLayoutRegisterNewPersonal>
     textEditingControllerName.dispose();
     textEditingControllerEmail.dispose();
     textEditingControllerLastName.dispose();
+    if (listWorkers != null && listWorkers.isNotEmpty) {
+      listWorkers.clear();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return SingleChildScrollView(
-      child: Stack(
-        //mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: ClipPath(
-              clipper: MyCustomClipper(),
-              child: Container(
-                height: 220,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                      colors: [
-                        DataSource.secondaryColor,
-                        DataSource.primaryColor,
+    return WillPopScope(
+        child: SingleChildScrollView(
+          reverse: true,
+          child: AbsorbPointer(
+            absorbing: showLoadingProgress,
+            child: Opacity(
+              opacity: opacity,
+              child: Column(
+                children: [
+                  Container(
+                    width: 100.w,
+                    height: 35.h,
+                    child: CustomPaint(
+                      painter: PainterRegisterPersonal(),
+                      child: Visibility(
+                        visible: showLoadingProgress,
+                        child: Container(
+                          margin: EdgeInsets.only(top: 20.h),
+                          child: SpinKitCircle(
+                            size: 20.w,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Column(
+                      children: [
+                        _EditTextEmail(12.sp),
+                        _EditTextNameUser(12.sp),
+                        _EditTextLastNameUser(12.sp),
+                        ButtonRegistrar(),
                       ],
-                    )),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(top: 100),
-                  padding: EdgeInsets.all(15),
-                  decoration: ShapeDecoration(
-                    shape: CircleBorder(
-                        side: BorderSide(
-                            width: 2, color: DataSource.primaryColor)),
-                    color: Colors.white,
-                  ),
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Align(
-                        //alignment: Alignment.bottomCenter,
-                        child: pickedImage==null?Image(
-                            width: 100,
-                            height: 100,
-                            image:  AssetImage('assets/waitress.png')):
-                        Image.file(pickedImage),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 125),
-                          child: FloatingActionButton(
-                            child: Icon(Icons.add_a_photo),
-                            onPressed: () {
-                              showOptionsPhoto();
-                            },
-                            backgroundColor: Colors.green,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                _EditTextEmail(),
-                _EditTextNameUser(),
-                _EditTextLastNameUser(),
-                ButtonRegistrar(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+        onWillPop: () async {
+          if (!showLoadingProgress) {
+            Navigator.pop(context, listWorkers);
+          }
+          return showLoadingProgress ? false : true;
+        });
   }
 
   @override
   void notifyViewStartLoading() {
     // TODO: implement notifyViewStartLoading
-    AlertDialog alertDialog = AlertDialog(
-      insetPadding: EdgeInsets.symmetric(horizontal: 120),
-      content: FractionallySizedBox(
-        heightFactor: 0.1,
-        child: SpinKitChasingDots(
-          duration: Duration(seconds: 2),
-          color: DataSource.primaryColor,
-        ),
-      ),
-      elevation: 24.0,
-    );
-    showDialog(
-        context: context,
-        builder: (BuildContext builderContext) {
-          builderAlertDialogCtx = builderContext;
-          return alertDialog;
-        });
+    setState(() {
+      showLoadingProgress = true;
+      opacity = 0.7;
+    });
   }
 
   @override
   void notifyViewEmptyFields() {
     // TODO: implement notifyViewEmptyFields
-    //AlertDialog alertDialog =
-    //WidgetsX.buildAlertDialog("Debe llenar todos los campos", "warning",13.sp);
-    /*showDialog(
-        context: context,
-        builder: (BuildContext builderContext) {
-          return alertDialog;
-        });*/
-  }
-
-  @override
-  void notifyViewShowMsgError(String msgError) {
-    if (builderAlertDialogCtx != null) {
-      Navigator.pop(builderAlertDialogCtx);
-    }
-    /*AlertDialog alertDialog = WidgetsX.buildAlertDialog(msgError, "error",13.sp);
+    AlertDialog alertDialog = WidgetsX.buildAlertDialog(
+        "Debe llenar todos los campos", "warning", 13.sp);
     showDialog(
         context: context,
         builder: (BuildContext builderContext) {
           return alertDialog;
-        });*/
+        });
+  }
+
+  @override
+  void notifyViewShowMsgError(String msgError) {
+    setState(() {
+      showLoadingProgress = false;
+      opacity = 1.0;
+    });
+    AlertDialog alertDialog =
+        WidgetsX.buildAlertDialog(msgError, "error", 13.sp);
+    showDialog(
+        context: context,
+        builder: (BuildContext builderContext) {
+          return alertDialog;
+        });
   }
 
   @override
   void notifyViewSuccessfulUserCreated(
       BackendlessUser newBackendlessUserCreated) {
-    Navigator.pop(builderAlertDialogCtx);
+    var nameUserCreated = newBackendlessUserCreated
+        .getProperty(DataSource.COLUMN_NAME)
+        .toString();
+    setState(() {
+      showLoadingProgress = false;
+      opacity = 1.0;
+    });
     textEditingControllerLastName.clear();
     textEditingControllerEmail.clear();
     textEditingControllerName.clear();
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              UserCreatedDetails(newUserCreated: newBackendlessUserCreated),
-        ));
+    var snackBar = SnackBar(content: Text("Se creó el usuario "+nameUserCreated+" correctamente"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    if (listWorkers == null || listWorkers.isEmpty) {
+      listWorkers = List();
+    }
+    listWorkers.add(newBackendlessUserCreated);
+    //Navigator.pop(context,newBackendlessUserCreated);
   }
 
   void showOptionsPhoto() {
@@ -265,7 +247,7 @@ class _MobileLayoutStaFulWidget extends State<MobileLayoutRegisterNewPersonal>
             children: [
               GestureDetector(
                 child:
-                Icon(Icons.image, color: DataSource.primaryColor, size: 40),
+                    Icon(Icons.image, color: DataSource.primaryColor, size: 40),
               ),
               Text('Galería'),
             ],
@@ -276,54 +258,67 @@ class _MobileLayoutStaFulWidget extends State<MobileLayoutRegisterNewPersonal>
     showDialog(
         context: context,
         builder: (BuildContext alertDialogOptionCamera) {
-          contexAlertCamera = alertDialogOptionCamera;
+          contextAlertCamera = alertDialogOptionCamera;
           return alertDialog;
         });
   }
 
   void openCamera() async {
-    if (contexAlertCamera != null) {
-      Navigator.pop(contexAlertCamera);
+    if (contextAlertCamera != null) {
+      Navigator.pop(contextAlertCamera);
     }
-    pickedImage =
-    (await ImagePicker.platform.pickImage(source: ImageSource.camera)) as File;
+    /*pickedImage = (await ImagePicker.platform
+        .pickImage(source: ImageSource.camera)) as File;
     if (pickedImage != null) {
       setState(() {});
-    }
+    }*/
   }
 }
 
-class MyCustomClipper extends CustomClipper<Path> {
+class PainterRegisterPersonal extends CustomPainter {
   @override
-  Path getClip(Size size) {
-    // TODO: implement getClip
-    var path = Path();
-    path.lineTo(0, size.height);
-    var firstStart = Offset(size.width / 5, size.height);
+  void paint(Canvas canvas, Size size) {
+    Paint paint0 = Paint()
+      ..color = const Color.fromARGB(255, 33, 150, 243)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 1;
+    paint0.shader = ui.Gradient.linear(
+        Offset(0, size.height * 0.50),
+        Offset(size.width * 1.00, size.height * 0.50),
+        [DataSource.primaryColor, DataSource.secondaryColor],
+        [0.00, 1.00]);
 
-    var firstEnd = Offset(size.width / 2.25, size.height - 50);
+    Path path0 = Path();
+    path0.moveTo(0, size.height);
+    path0.quadraticBezierTo(size.width * 0.4137500, size.height * 0.8066667,
+        size.width * 0.4150000, size.height * 0.5500000);
+    path0.cubicTo(
+        size.width * 0.4175000,
+        size.height * 0.3025000,
+        size.width * 0.6558333,
+        size.height * 0.5550000,
+        size.width * 0.7883333,
+        size.height * 0.5600000);
+    path0.quadraticBezierTo(size.width * 0.9075000, size.height * 0.5558333,
+        size.width * 0.9983333, 0);
+    path0.lineTo(0, 0);
 
-    path.quadraticBezierTo(
-        firstStart.dx, firstStart.dy, firstEnd.dx, firstEnd.dy);
-
-    var secondStart = Offset(size.width - size.width / 3.24, size.height - 105);
-
-    var secondEnd = Offset(size.width, size.height - 50);
-
-    path.quadraticBezierTo(
-        secondStart.dx, secondStart.dy, secondEnd.dx, secondEnd.dy);
-    path.lineTo(size.width, 0);
-    return path;
+    canvas.drawPath(path0, paint0);
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) {
-    // TODO: implement shouldReclip
-    return true;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    // TODO: implement shouldRepaint
+    return false;
   }
 }
 
 class _EditTextLastNameUser extends StatelessWidget {
+  final textHeight;
+
+  _EditTextLastNameUser(this.textHeight);
+
+  @override
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -335,16 +330,16 @@ class _EditTextLastNameUser extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(bottom: 5),
               child: Text('Apellidos',
-                  style:
-                  TextStyle(color: DataSource.primaryColor, fontSize: 15)),
+                  style: TextStyle(
+                      color: DataSource.primaryColor, fontSize: textHeight)),
             ),
             TextField(
                 cursorColor: DataSource.primaryColor,
                 controller: textEditingControllerLastName,
                 keyboardType: TextInputType.text,
                 style: TextStyle(
-                  // height: aspectRatio,
-                  //color: Colors.black,
+                    // height: aspectRatio,
+                    //color: Colors.black,
                     fontSize: 17,
                     decorationColor: DataSource.primaryColor),
                 decoration: InputDecoration(
@@ -368,8 +363,7 @@ class ButtonRegistrar extends StatelessWidget {
           elevation: 10,
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           textStyle: TextStyle(fontSize: 20)),
-      onPressed: () =>
-      {
+      onPressed: () => {
         initRegisterUser(),
       },
       child: Text(
@@ -379,14 +373,18 @@ class ButtonRegistrar extends StatelessWidget {
   }
 
   initRegisterUser() {
-    String name = textEditingControllerName.text;
-    String email = textEditingControllerEmail.text + emailDomain;
-    String lastName = textEditingControllerLastName.text;
+    String name = textEditingControllerName.text.trim();
+    String email = textEditingControllerEmail.text.trim() + emailDomain;
+    String lastName = textEditingControllerLastName.text.trim();
     presenterRegisterUserMVP.requestModelRegisterUser(name, lastName, email);
   }
 }
 
 class _EditTextEmail extends StatelessWidget {
+  final textHeight;
+
+  _EditTextEmail(this.textHeight);
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -400,7 +398,7 @@ class _EditTextEmail extends StatelessWidget {
               child: Text('Email',
                   style: TextStyle(
                     color: DataSource.primaryColor,
-                    fontSize: 15,
+                    fontSize: textHeight,
                   )),
             ),
             Row(
@@ -413,7 +411,7 @@ class _EditTextEmail extends StatelessWidget {
                       controller: textEditingControllerEmail,
                       keyboardType: TextInputType.text,
                       style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 12.sp,
                           decorationColor: DataSource.primaryColor),
                       decoration: InputDecoration(
                         focusedBorder: outlineInputBorder,
@@ -447,6 +445,10 @@ class _EditTextEmail extends StatelessWidget {
 }
 
 class _EditTextNameUser extends StatelessWidget {
+  final textHeight;
+
+  _EditTextNameUser(this.textHeight);
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -458,8 +460,8 @@ class _EditTextNameUser extends StatelessWidget {
             Container(
               margin: EdgeInsets.only(bottom: 5),
               child: Text('Nombre',
-                  style:
-                  TextStyle(color: DataSource.primaryColor, fontSize: 15)),
+                  style: TextStyle(
+                      color: DataSource.primaryColor, fontSize: textHeight)),
             ),
             TextField(
                 cursorColor: DataSource.primaryColor,

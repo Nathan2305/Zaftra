@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:test_login/View/Interfaces/interfaceMainMenuMVP.dart';
+import 'package:RestaurantAdmin/View/Interfaces/interfaceMainMenuMVP.dart';
 
 import '../../Utils/DataSource.dart';
 import '../../Utils/Methods.dart';

@@ -1,9 +1,9 @@
 //@dart=2.9
 
+import 'package:RestaurantAdmin/Model/ModelMiPersonalMVP.dart';
+import 'package:RestaurantAdmin/View/Interfaces/interfaceMiPersonalMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
-import 'package:test_login/DAO/Personal.dart';
-import 'package:test_login/Model/ModelMiPersonalMVP.dart';
-import 'package:test_login/View/Interfaces/interfaceMiPersonalMVP.dart';
+
 
 class PresenterMiPersonalMVP{
 

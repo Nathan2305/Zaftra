@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:sizer/sizer.dart';
-import 'package:test_login/Utils/Methods.dart';
-import 'package:test_login/View/WebDesign/MainMenuWeb.dart';
+import 'package:RestaurantAdmin/View/WebDesign/MainMenuWeb.dart';
 
 import '../../main.dart';
 import 'LoginLayoutWeb.dart';
@@ -40,8 +39,7 @@ class _ValidateUserSession extends State<ValidateUserSession> {
 
   Future<void> validateSession() async {
     Map<dynamic, dynamic> mapUser;
-    String objectId =
-        await Backendless.userService.loggedInUser().catchError((onError) {
+    String objectId =await Backendless.userService.loggedInUser().catchError((onError) {
       PlatformException exception = onError;
       var msgError = 'Error obteniendo sesión de usuario:" $exception';
       print('Error: ' + msgError);

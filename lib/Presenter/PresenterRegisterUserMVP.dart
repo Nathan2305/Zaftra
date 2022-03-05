@@ -1,6 +1,6 @@
 import 'package:backendless_sdk/backendless_sdk.dart';
-import 'package:test_login/Model/ModelRegisterUserMVP.dart';
-import 'package:test_login/View/Interfaces/interfaceRegisterUserMVP.dart';
+import 'package:RestaurantAdmin/Model/ModelRegisterUserMVP.dart';
+import 'package:RestaurantAdmin/View/Interfaces/interfaceRegisterUserMVP.dart';
 
 class PresenterRegisterUserMVP {
   interfaceRegisterUserMVP _interface;

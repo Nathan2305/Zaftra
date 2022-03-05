@@ -1,7 +1,7 @@
+import 'package:RestaurantAdmin/Presenter/PresenterRegisterUserMVP.dart';
+import 'package:RestaurantAdmin/Utils/DataSource.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/services.dart';
-import 'package:test_login/Presenter/PresenterRegisterUserMVP.dart';
-import 'package:test_login/Utils/DataSource.dart';
 
 class ModelRegisterUserMVP {
   PresenterRegisterUserMVP presenterRegisterUserMVP;

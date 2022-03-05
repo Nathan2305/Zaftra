@@ -2,7 +2,7 @@ import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:test_login/Utils/DataSource.dart';
+import 'package:RestaurantAdmin/Utils/DataSource.dart';
 
 class UserCreatedDetails extends StatefulWidget {
   final BackendlessUser newUserCreated;

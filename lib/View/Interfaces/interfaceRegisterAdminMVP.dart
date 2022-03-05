@@ -1,4 +1,4 @@
-class interfaceRegisterMVP{
+class interfaceRegisterAdminMVP{
   void notifyViewShowPDialogLoading() {}
 
   void notifyViewEmptyField() {}
@@ -8,5 +8,7 @@ class interfaceRegisterMVP{
   void notifyViewShowErrorMsg(String msgError) {}
 
   void notifyViewFinishRoute() {}
+
+  void notifyViewSuccessfulAdminsCreated() {}
 
 }

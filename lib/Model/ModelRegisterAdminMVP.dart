@@ -1,39 +1,45 @@
 // @dart=2.9
 
+import 'package:RestaurantAdmin/Presenter/PresenterRegisterAdminMVP.dart';
+import 'package:RestaurantAdmin/Utils/DataSource.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/services.dart';
-import 'package:test_login/Presenter/PresenterRegisterMVP.dart';
-import 'package:test_login/Utils/DataSource.dart';
 
 class ModelRegisterMVP {
-  PresenterRegisterMVP presenterRegisterMVP;
+  PresenterRegisterAdminMVP presenterRegisterAdminMVP;
 
-  ModelRegisterMVP(this.presenterRegisterMVP);
+  ModelRegisterMVP(this.presenterRegisterAdminMVP);
 
-  void prepareModelValidateRegister(String emailUser,String nameAdmin, String nameResUser, String passUser) {
-    if (emailUser.isNotEmpty && nameAdmin.isNotEmpty && nameResUser.isNotEmpty && passUser.isNotEmpty) {
-      presenterRegisterMVP.notifyViewShowPDialogLoading();
+  void prepareModelValidateRegister(
+      String businessName, String owner, String email, String passwd) {
+    if (businessName.isNotEmpty &&
+        owner.isNotEmpty &&
+        email.isNotEmpty &&
+        passwd.isNotEmpty) {
+      presenterRegisterAdminMVP.notifyViewShowPDialogLoading();
       BackendlessUser user = BackendlessUser();
-      user.email = emailUser;
-      user.password = passUser;
+      user.email = email;
+      user.password = passwd;
       user.setProperty(DataSource.COLUMN_PROFILE, "admin");
-      user.setProperty(DataSource.COLUMN_NAME_RESTAURANT, nameResUser);
-      user.setProperty(DataSource.COLUMN_NAME, nameAdmin);
+      user.setProperty(DataSource.COLUMN_NAME_RESTAURANT, businessName);
+      user.setProperty(DataSource.COLUMN_NAME, owner);
       registerUser(user);
     } else {
-      presenterRegisterMVP.notifyViewEmptyField();
+      presenterRegisterAdminMVP.notifyViewEmptyField();
     }
   }
 
-  void registerUser(BackendlessUser user) {
-    Backendless.userService.register(user).then((BackendlessUser backendlessUser) {
-      presenterRegisterMVP.notifyViewCloseProgressDialog();
-      presenterRegisterMVP.notifyViewFinishRoute();
-    }).catchError((error) {
-      PlatformException exception = error;
-      String msgError = 'Error registrando usuario: $exception.message';
-      presenterRegisterMVP.notifyViewCloseProgressDialog();
-      presenterRegisterMVP.notifyViewShowErrorMsg(msgError);
+  Future<void> registerUser(BackendlessUser user) async {
+    BackendlessUser newAdminCreated = await Backendless.userService.register(user).catchError((onError) {
+      PlatformException exception = onError;
+      String msgError = 'Error registrando usuario:'+exception.message;
+      presenterRegisterAdminMVP.notifyViewCloseProgressDialog();
+      presenterRegisterAdminMVP.notifyViewShowErrorMsg(msgError);
     });
+    if (newAdminCreated != null) {
+            presenterRegisterAdminMVP.notifyViewCloseProgressDialog();
+            presenterRegisterAdminMVP.notifyViewSuccessfulAdminsCreated();
+      presenterRegisterAdminMVP.notifyViewFinishRoute();
+    }
   }
 }

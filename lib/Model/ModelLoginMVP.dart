@@ -1,9 +1,9 @@
 // @dart=2.9
 
+import 'package:RestaurantAdmin/Presenter/PresenterLoginMVP.dart';
+import 'package:RestaurantAdmin/main.dart';
 import 'package:flutter/services.dart';
-import 'package:test_login/Presenter/PresenterLoginMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
-import 'package:test_login/main.dart';
 
 class ModelLoginMVP {
   PresenterLoginMVP presenterLoginMVP;
