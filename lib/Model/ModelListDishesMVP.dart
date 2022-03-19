@@ -1,4 +1,6 @@
+//@dart=2.9
 import 'package:RestaurantAdmin/DAO/Dishes.dart';
+import 'package:RestaurantAdmin/Model/ModelMainMenuMVP.dart';
 import 'package:RestaurantAdmin/Presenter/PresenterDishesMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/services.dart';
@@ -10,36 +12,33 @@ class ModelDishesMVP {
 
   ModelDishesMVP(this.presenterDishesMVP);
 
-  void prepareModelLoadMyDishes(String category) {
-    presenterDishesMVP.notifyViewStartLoadingWidget();
-    var myOwnerId = MyAppMain.currentUser.getObjectId();
+  List<Dishes> fullListDishes = List();
+
+  Future<List<Dishes>> prepareModelLoadMyDishes(String category) {
+    var myOwnerId = ModelMainMenuMVP.currentUser.getObjectId();
     DataQueryBuilder dataQueryBuilder = DataQueryBuilder()
-      ..whereClause = "ownerId='${myOwnerId}' and category='${category}'";
-    dataQueryBuilder.offset = 0;
-    dataQueryBuilder.pageSize = 10;
+      ..whereClause = "ownerId='${myOwnerId}' and category='${category}'"
+      ..sortBy = ["created DESC"]
+      ..pageSize = 10
+      ..offset = 0;
+
     loadMyDishes(dataQueryBuilder);
+
+
+    return Future.value(fullListDishes);
   }
 
-  Future<void> loadMyDishes(DataQueryBuilder dataQueryBuilder) async {
-    bool error = false;
-    var listDishes = await Backendless.data
+  void loadMyDishes(DataQueryBuilder dataQueryBuilder) async {
+    List<Dishes> listDishes = await Backendless.data
         .withClass<Dishes>()
         .find(dataQueryBuilder)
-        .catchError((error) {
-      error = true;
-      PlatformException exception = error;
-      String msgError = 'Error mostrando platos: ${exception.message}';
-      presenterDishesMVP.notifyViewCloseLoadingWidget();
-      presenterDishesMVP.notifyViewShowMessage("error", msgError);
+        .catchError((OnError) {
+
     });
-    if (!error) {
-      if (listDishes != null && listDishes.length > 0) {
-        presenterDishesMVP.notifyViewShowDishes();
-        presenterDishesMVP.notifyViewShowDishesAmount(listDishes.length);
-      } else {
-        presenterDishesMVP.notifyViewEmptyDishes();
-        presenterDishesMVP.notifyViewShowDishesAmount(0);
-      }
+    if (listDishes!=null && listDishes.isNotEmpty) {
+      fullListDishes.addAll(listDishes);
+      dataQueryBuilder.prepareNextPage();
+      loadMyDishes(dataQueryBuilder);
     }
   }
 }

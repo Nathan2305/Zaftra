@@ -20,4 +20,12 @@ class PresenterMainMenuMVP{
   notifySuccessfulLogOut() {
     _interfaceMainMenuMVP.notifySuccessfulLogOut();
   }
+
+  void requestModelShowFields(String objectId) {
+    _modelMainMenuMVP.prepareModelShowFields(objectId);
+  }
+
+  void notifyViewShowFields(String businessName) {
+    _interfaceMainMenuMVP.notifyViewShowFields(businessName);
+  }
 }

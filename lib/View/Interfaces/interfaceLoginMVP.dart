@@ -7,5 +7,5 @@ abstract class interfaceLoginMVP {
 
   void notifyViewCloseLottieDialog() {}
 
-  void notifyViewShowSuccessFullLogin() {}
+  void notifyViewShowSuccessFullLogin(String objectId) {}
 }

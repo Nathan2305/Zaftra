@@ -37,7 +37,6 @@ void main() {
 
 class MyAppLoginScreen extends StatelessWidget {
   // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -116,9 +115,9 @@ class _LoginLayoutMobile extends State<LoginLayoutMobile>
   }
 
   @override
-  void notifyViewShowSuccessFullLogin() {
+  void notifyViewShowSuccessFullLogin(String objectId) {
     Navigator.pushAndRemoveUntil(fullContext,
-        Methods.createRoute(MainMenuAdmin()), (Route<dynamic> route) => false);
+        Methods.createRoute(MainMenuScreen(objectId)), (Route<dynamic> route) => false);
   }
 
   showDialogMsg(String msg, String typeMsg, double sizeText) {

@@ -215,7 +215,7 @@ class _BodyStatefulLoginWeb extends State<StatefulLoginWeb>
   }
 
   @override
-  void notifyViewShowSuccessFullLogin() {
+  void notifyViewShowSuccessFullLogin(String objectId) {
     // TODO: implement notifyViewShowSuccessFullLogin
     Navigator.pushAndRemoveUntil(context, Methods.createRoute(MainMenuWeb()), (Route<dynamic> route) => false);
   }

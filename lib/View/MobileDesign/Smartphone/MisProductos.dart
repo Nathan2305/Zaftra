@@ -55,33 +55,43 @@ class _MisProductos extends State<MisProductos> with TickerProviderStateMixin {
       builder: (BuildContext context, Orientation orientation,
           DeviceType deviceType) {
         return Scaffold(
-          backgroundColor: DataSource.primaryColor,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.h),
-                  child: Text(
-                    'Selecciona una opción',
-                    style: TextStyle(fontSize: 8.w, color: Colors.white),
+          body: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+              colors: [
+                DataSource.primaryColorPlatos,
+                DataSource.secondaryColorPlatos
+              ],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+            )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10.h),
+                    child: Text(
+                      'Selecciona una opción',
+                      style: TextStyle(fontSize: 8.w, color: Colors.white),
+                    ),
                   ),
+                  flex: 1,
                 ),
-                flex: 1,
-              ),
-              Expanded(
-                flex: 5,
-                child: PageView(controller: pageController, children: [
-                  Widget_PlatosCriollos(),
-                  Widget_Sopas(),
-                  Widget_SeaFood(),
-                  Widget_Parrillas(),
-                  Widget_Bebidas(),
-                  Widget_Postres(),
-                  Widget_Otros(),
-                ]),
-              )
-            ],
+                Expanded(
+                  flex: 5,
+                  child: PageView(controller: pageController, children: [
+                    Widget_PlatosCriollos(),
+                    Widget_Sopas(),
+                    Widget_SeaFood(),
+                    Widget_Parrillas(),
+                    Widget_Bebidas(),
+                    Widget_Postres(),
+                    Widget_Otros(),
+                  ]),
+                )
+              ],
+            ),
           ),
         );
       },
@@ -94,7 +104,7 @@ class Widget_Otros extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     var category = listCategories.elementAt(6);
-    var url=listCategoriesImageUrl.elementAt(6);
+    var url = listCategoriesImageUrl.elementAt(6);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -123,7 +133,7 @@ class Widget_Postres extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var category = listCategories.elementAt(5);
-    var url=listCategoriesImageUrl.elementAt(5);
+    var url = listCategoriesImageUrl.elementAt(5);
     // TODO: implement build
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -131,12 +141,10 @@ class Widget_Postres extends StatelessWidget {
         GestureDetector(
           child: Hero(
             tag: url,
-            child: Image.network(url,
-                width: 75.w, height: 40.h),
+            child: Image.network(url, width: 75.w, height: 40.h),
           ),
           onTap: () {
-            startRouteProductDetail(
-                context, category, url);
+            startRouteProductDetail(context, category, url);
           },
         ),
         Hero(
@@ -156,19 +164,17 @@ class Widget_Bebidas extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     var category = listCategories.elementAt(4);
-    var url=listCategoriesImageUrl.elementAt(4);
+    var url = listCategoriesImageUrl.elementAt(4);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
           child: Hero(
             tag: url,
-            child: Image.network(url,
-                width: 75.w, height: 40.h),
+            child: Image.network(url, width: 75.w, height: 40.h),
           ),
           onTap: () {
-            startRouteProductDetail(
-                context, category, url);
+            startRouteProductDetail(context, category, url);
           },
         ),
         Hero(
@@ -187,7 +193,7 @@ class Widget_Parrillas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var category = listCategories.elementAt(3);
-    var url=listCategoriesImageUrl.elementAt(3);
+    var url = listCategoriesImageUrl.elementAt(3);
     // TODO: implement build
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -195,12 +201,10 @@ class Widget_Parrillas extends StatelessWidget {
         InkWell(
           child: Hero(
             tag: url,
-            child: Image.network(url,
-                width: 75.w, height: 40.h),
+            child: Image.network(url, width: 75.w, height: 40.h),
           ),
           onTap: () {
-            startRouteProductDetail(
-                context, category, url);
+            startRouteProductDetail(context, category, url);
           },
         ),
         Hero(
@@ -220,23 +224,21 @@ class Widget_SeaFood extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     var category = listCategories.elementAt(2);
-    var url=listCategoriesImageUrl.elementAt(2);
+    var url = listCategoriesImageUrl.elementAt(2);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
           child: Hero(
             tag: url,
-            child: Image.network(url,
-                width: 75.w, height: 40.h),
+            child: Image.network(url, width: 75.w, height: 40.h),
           ),
           onTap: () {
-            startRouteProductDetail(
-                context, category, url);
+            startRouteProductDetail(context, category, url);
           },
         ),
         Hero(
-          tag: category ,
+          tag: category,
           child: Text(
             category,
             style: TextStyle(fontSize: 20.sp, color: Colors.white),
@@ -252,7 +254,7 @@ class Widget_Sopas extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     var category = listCategories.elementAt(1);
-    var url=listCategoriesImageUrl.elementAt(1);
+    var url = listCategoriesImageUrl.elementAt(1);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -261,11 +263,14 @@ class Widget_Sopas extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              child: Image.network(url,
-                width: 75.w, height: 40.h, fit: BoxFit.contain,),
+              child: Image.network(
+                url,
+                width: 75.w,
+                height: 40.h,
+                fit: BoxFit.contain,
+              ),
               onTap: () {
-                startRouteProductDetail(
-                    context, category, url);
+                startRouteProductDetail(context, category, url);
               },
             ),
           ),
@@ -287,19 +292,17 @@ class Widget_PlatosCriollos extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     var category = listCategories.elementAt(0);
-    var url=listCategoriesImageUrl.elementAt(0);
+    var url = listCategoriesImageUrl.elementAt(0);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
           child: Hero(
             tag: url,
-            child: Image.network(url,
-                width: 75.w, height: 40.h),
+            child: Image.network(url, width: 75.w, height: 40.h),
           ),
           onTap: () {
-            startRouteProductDetail(
-                context, category,url);
+            startRouteProductDetail(context, category, url);
           },
         ),
         Hero(
@@ -336,7 +339,8 @@ class MyClipperScroll extends CustomClipper<Path> {
   }
 }
 
-void startRouteProductDetail(BuildContext context, String category,String url) {
+void startRouteProductDetail(
+    BuildContext context, String category, String url) {
   //Methods.startNewRoute(context, productDetail);
   Navigator.push(
     context,

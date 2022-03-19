@@ -1,6 +1,7 @@
 // @dart=2.9
 import 'dart:async';
 
+import 'package:RestaurantAdmin/Model/ModelMainMenuMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -53,7 +54,7 @@ class _ValidateUserSession extends State<ValidateUserSession> {
         //msgError = 'Error obteniendo sesión de usuario:" $exception';
       }));
       if (mapUser != null) {
-        MyAppMain.currentUser = BackendlessUser.fromJson(mapUser);
+        ModelMainMenuMVP.currentUser = BackendlessUser.fromJson(mapUser);
         finishValidating = true;
         targetWidget = MainMenuWeb();
       }

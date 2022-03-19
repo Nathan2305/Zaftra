@@ -41,6 +41,45 @@ class WidgetsX {
     return alertDialog;
   }
 
+  static AlertDialog alertDialogSuccessfulMessage(String msg, double textSize) {
+    AlertDialog alertDialog = AlertDialog(
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20), topRight: Radius.circular(20))),
+
+      titlePadding: EdgeInsets.all(0),
+      title: Container(
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+        ),
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.check,
+              color: Colors.white,
+              size: textSize*3,
+            ),
+          ],
+        ),
+      ),
+      content: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(child: Text(
+            msg,
+            style: TextStyle(fontSize: textSize),
+            textAlign: TextAlign.center,
+          ),flex: 1)
+        ],
+      ),
+      elevation: 10,
+    );
+    return alertDialog;
+  }
+
   static ProgressDialog showProgressDialog(
       BuildContext context, String msg, double textSize) {
     ProgressDialog pb = ProgressDialog(context, isDismissible: false);
@@ -70,8 +109,4 @@ class WidgetsX {
       elevation: 24.0,
     );
   }
-
-
 }
-
-

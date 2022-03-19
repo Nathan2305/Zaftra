@@ -1,23 +1,23 @@
 //@dart=2.9
 
+import 'package:RestaurantAdmin/Model/ModelMainMenuMVP.dart';
 import 'package:RestaurantAdmin/Utils/Methods.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:RestaurantAdmin/Presenter/PresenterMiPersonalMVP.dart';
 import 'package:RestaurantAdmin/Utils/DataSource.dart';
 import 'dart:ui' as ui;
-import 'package:RestaurantAdmin/View/Interfaces/interfaceMiPersonalMVP.dart';
 import 'package:sizer/sizer.dart';
-import 'package:focus_detector/focus_detector.dart';
 import 'MyPersonalDetailScreen.dart';
 import 'RegisterNewPersonal.dart';
 
-//List<String> items;
-List<BackendlessUser> listPersonal = List();
-Animation<Offset> _offsetAnimation;
+Future<List<BackendlessUser>> listPersonalFuture;
+List<BackendlessUser> listPersonal;
+AnimationController _controller;
 var listKey = GlobalKey<AnimatedListState>();
+var _offsetAnimation;
 
 void main() {
   runApp(PersonalScreenState());
@@ -28,15 +28,10 @@ class PersonalScreenState extends StatefulWidget {
 }
 
 class _PersonalScreenState extends State<PersonalScreenState>
-    with SingleTickerProviderStateMixin
-    implements interfaceMiPersonalMVP {
-  AnimationController _controller;
-
-  //bool emptyWorkers = true;
-  bool loadingFinished = false;
-
+    with SingleTickerProviderStateMixin {
   @override
   void initState() {
+    super.initState();
     _controller =
         AnimationController(vsync: this, duration: Duration(seconds: 2))
           ..forward();
@@ -47,18 +42,18 @@ class _PersonalScreenState extends State<PersonalScreenState>
       parent: _controller,
       curve: Curves.decelerate,
     ));
-    PresenterMiPersonalMVP presenterMiPersonalMVP =
-        PresenterMiPersonalMVP(this);
-    presenterMiPersonalMVP.requestModelLoadPersonal();
-    super.initState();
+    var myOwnerId = ModelMainMenuMVP.currentUser.getObjectId();
+    DataQueryBuilder dataQueryBuilder = DataQueryBuilder()
+      ..whereClause = "ownerId='${myOwnerId}' and profile='worker'"
+      ..sortBy = ["created DESC"]
+      ..pageSize = 100
+      ..offset = 0;
+    listPersonalFuture = Backendless.data.withClass<BackendlessUser>().find(dataQueryBuilder);
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    if (listPersonal != null && listPersonal.isNotEmpty) {
-      listPersonal.clear();
-    }
     super.dispose();
   }
 
@@ -69,51 +64,42 @@ class _PersonalScreenState extends State<PersonalScreenState>
         builder: (context, Orientation orientation, DeviceType deviceType) {
       return Scaffold(
           appBar: AppBar(
-            backgroundColor: DataSource.primaryColor,
+            backgroundColor: DataSource.primaryColorPersonal,
             title: Text('Mi personal'),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    PushAndWaitData(context);
+                  },
+                  icon: Icon(
+                    Icons.person_add,
+                    color: Colors.white,
+                  ))
+            ],
           ),
-          body: !loadingFinished
-              ? SpinkitLoading()
-              : Stack(
-                  children: [
-                    Align(
-                        alignment: Alignment.center,
-                        child: ListWorkersWidget()),
-                    Align(
-                        alignment: Alignment.bottomRight,
-                        child: FabButtonAddWorker()),
-                  ],
-                ));
+          body: FutureBuilder(
+            future: listPersonalFuture,
+            builder: (BuildContext context,
+                AsyncSnapshot<List<BackendlessUser>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SpinkitLoading();
+              } else {
+                if (snapshot.hasData) {
+                  listPersonal = snapshot.data;
+                  return ListWorkersWidget(listPersonal);
+                } else if (!snapshot.hasData) {
+                  return Center(
+                    child: Text('Aún no tienes personal registrado'),
+                  );
+                } else {
+                  return Center(
+                      child:
+                          Text('Error obteniendo personal ${snapshot.error}'));
+                }
+              }
+            },
+          ));
     });
-  }
-
-  @override
-  void notifyViewShowListPersonal(List<BackendlessUser> listPersonalFound) {
-    // TODO: implement notifyViewShowListPersonal
-    setState(() {
-      //emptyWorkers = false;
-      loadingFinished = true;
-      //listPersonal = listPersonalFound;
-      listPersonal.addAll(listPersonalFound);
-    });
-  }
-
-  @override
-  void notifyViewShowMsgEmptyPersonal() {
-    const snackBar =
-        SnackBar(content: Text('Aún no tienes trabajadores agregados'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    setState(() {
-      /* if (!emptyWorkers) {
-        emptyWorkers = true;
-      }*/
-      loadingFinished = true;
-    });
-  }
-
-  @override
-  void notifyViewShowMsgError(String msgError) {
-    // TODO: implement notifyViewShowMsgError
   }
 
   void PushAndWaitData(BuildContext context) async {
@@ -121,46 +107,50 @@ class _PersonalScreenState extends State<PersonalScreenState>
       context,
       MaterialPageRoute(builder: (context) => RegisterNewPersonalScreen()),
     );
-      if (Methods.hasItems(listNewWorkers)) {
-        for (int pos = 0; pos < listNewWorkers.length; pos++) {
-          listPersonal.insert(pos, listNewWorkers.elementAt(pos));
-          listKey.currentState.insertItem(pos, duration: Duration(seconds: 1));
-        }
+    if (Methods.hasItems(listNewWorkers)) {
+      for (int pos = 0; pos < listNewWorkers.length; pos++) {
+        listPersonal.insert(pos, listNewWorkers.elementAt(pos));
+        listKey.currentState.insertItem(pos, duration: Duration(seconds: 1));
       }
-
+    }
   }
 }
 
 class ListWorkersWidget extends StatelessWidget {
+  final listPersonal;
+
+  ListWorkersWidget(this.listPersonal);
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return AnimatedList(
-      key: listKey,
-      initialItemCount: listPersonal.length,
-      itemBuilder: (context, index, animation) {
-        var fullName = Methods.concatenateAttrs(listPersonal[index],
-            DataSource.COLUMN_NAME, DataSource.COLUMN_LAST_NAME);
-        var email = listPersonal[index].email;
-        return SlideTransition(
-          position: animation.drive(Tween<Offset>(
-            begin: const Offset(-5.5, 0),
-            end: const Offset(0.0, 0.0),
-          )),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => MyPersonalDetailScreen(
-                        userSelected: listPersonal[index])),
-              );
-            },
-            child: CardEachWorkerWidget(fullName, email),
-          ),
-        );
-      },
-    );
+    return FlipInY(
+        duration: Duration(seconds: 2),
+        child: AnimatedList(
+          key: listKey,
+          initialItemCount: listPersonal.length,
+          itemBuilder: (context, index, animation) {
+            var fullName = Methods.concatenateAttrs(listPersonal[index],
+                DataSource.COLUMN_NAME, DataSource.COLUMN_LAST_NAME);
+            var email = listPersonal[index].email;
+            return SlideTransition(
+                position: animation.drive(Tween<Offset>(
+                  begin: const Offset(-5.5, 5.5),
+                  end: const Offset(0.0, 0.0),
+                )),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MyPersonalDetailScreen(
+                              userSelected: listPersonal[index])),
+                    );
+                  },
+                  child: CardEachWorkerWidget(fullName, email),
+                ));
+          },
+        ));
   }
 }
 
@@ -174,43 +164,52 @@ class CardEachWorkerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 2.h, horizontal: 5.w),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topRight: Radius.circular(20), topLeft: Radius.circular(20))),
+      margin: EdgeInsets.symmetric(vertical: 2.h, horizontal: 6.w),
       elevation: 10,
       child: Container(
-        width: 100.w,
-        height: 45.h,
+        width: 30.h,
+        height: 30.h,
         //padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Container(
-              child:
-                  Image(height: 20.h, image: AssetImage('assets/waitress.png')),
-              margin: EdgeInsets.only(top: 2.h),
-            ),
-            Container(
-              width: 100.w,
-              height: 23.h,
-              child: CustomPaint(
-                  painter: CardPainter(),
+        child: CustomPaint(
+          painter: CardPainter(),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 3.h),
+                  child: Image(
+                    width: 35.w,
+                    height: 35.w,
+                    image: AssetImage('assets/waitress.png'),
+                  ),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(
+                          width: 3, color: DataSource.secondaryColorPersonal)),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: Padding(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.h),
-                        child: Text(fullName,
-                            style: TextStyle(
-                                fontSize: 20.sp, color: Colors.white)),
-                      ),
+                      Text(fullName,
+                          style:
+                              TextStyle(fontSize: 17.sp, color: Colors.white)),
                       Text(email,
                           style:
                               TextStyle(fontSize: 15.sp, color: Colors.white))
                     ],
-                  )),
-            ),
-          ],
+                  ),
+                  padding: EdgeInsets.only(left: 3.w, bottom: 1.h),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -224,7 +223,6 @@ class FabButtonAddWorker extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(bottom: 15, right: 15),
       child: FloatingActionButton(
-        //heroTag: "fab-route",
         onPressed: () {
           _PersonalScreenState().PushAndWaitData(context);
         },
@@ -243,7 +241,7 @@ class SpinkitLoading extends StatelessWidget {
     return SpinKitChasingDots(
       size: 100,
       duration: Duration(seconds: 2),
-      color: DataSource.primaryColor,
+      color: DataSource.secondaryColorPersonal,
     );
   }
 }
@@ -258,32 +256,15 @@ class CardPainter extends CustomPainter {
     paint0.shader = ui.Gradient.linear(
         Offset(size.width * -0.00, size.height * 0.51),
         Offset(size.width * 1.00, size.height * 0.51),
-        [DataSource.primaryColor, DataSource.secondaryColor],
+        [DataSource.primaryColorPersonal, DataSource.secondaryColorPersonal],
         [0.00, 1.00]);
 
-    Path path0 = Path();
-    //path0.moveTo(0,size.height*0.3300000);
-    path0.lineTo(0, size.height);
-    path0.lineTo(size.width, size.height);
-    path0.lineTo(size.width * 0.9983333, size.height * 0.3425000);
-    path0.quadraticBezierTo(size.width * 0.8033333, size.height * 0.0181250,
-        size.width * 0.6666667, size.height * 0.0175000);
-    path0.cubicTo(
-        size.width * 0.5854167,
-        size.height * 0.0206250,
-        size.width * 0.4037500,
-        size.height * 0.2918750,
-        size.width * 0.3650000,
-        size.height * 0.1700000);
-    path0.cubicTo(
-        size.width * 0.3279167,
-        size.height * 0.0593750,
-        size.width * 0.1470833,
-        size.height * 0.3200000,
-        size.width * 0.0633333,
-        size.height * 0.1375000);
-    path0.quadraticBezierTo(size.width * 0.0087500, size.height * 0.1125000,
-        size.width * -0.0016667, size.height * 0.3300000);
+    Path path0 = Path()
+      ..lineTo(0, 0)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..lineTo(0, 0);
+
     path0.close();
 
     canvas.drawPath(path0, paint0);

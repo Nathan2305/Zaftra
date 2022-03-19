@@ -1,16 +1,18 @@
+//@dart=2.9
+import 'package:RestaurantAdmin/DAO/Dishes.dart';
 import 'package:RestaurantAdmin/Model/ModelListDishesMVP.dart';
 import 'package:RestaurantAdmin/View/Interfaces/interfaceDishesMVP.dart';
 
 class PresenterDishesMVP {
   interfaceDishesMVP _interfaceDishesMVP;
-  ModelDishesMVP? modelDishesMVP;
+  ModelDishesMVP modelDishesMVP;
 
   PresenterDishesMVP(this._interfaceDishesMVP) {
     modelDishesMVP = ModelDishesMVP(this);
   }
 
-  void requestModelLoadMyDishes(String category) {
-    modelDishesMVP?.prepareModelLoadMyDishes(category);
+  Future<List<Dishes>> requestModelLoadMyDishes(String category) {
+    return modelDishesMVP?.prepareModelLoadMyDishes(category);
   }
 
   void notifyViewEmptyDishes() {

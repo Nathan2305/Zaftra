@@ -32,7 +32,7 @@ class PresenterLoginMVP {
     _interfaceLoginMVP.notifyViewCloseLottieDialog();
   }
 
-  void notifyViewShowSuccessFullLogin() {
-    _interfaceLoginMVP.notifyViewShowSuccessFullLogin();
+  void notifyViewShowSuccessFullLogin(String objectId) {
+    _interfaceLoginMVP.notifyViewShowSuccessFullLogin(objectId);
   }
 }

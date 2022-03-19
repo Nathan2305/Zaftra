@@ -2,6 +2,7 @@
 import 'package:RestaurantAdmin/DAO/Dishes.dart';
 import 'package:RestaurantAdmin/Presenter/PresenterAddDishesMVP.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
+import 'package:flutter/services.dart';
 
 class ModelAddDishesMVP {
   PresenterAddDishesMVP presenterAddDishesMVP;
@@ -30,8 +31,8 @@ class ModelAddDishesMVP {
         .save(dish)
         .catchError((onError) {
       containError = true;
-      //PlatformException exception = onError;
-      String msgError = 'Error registrando nuevo plato:' +onError.toString();
+      PlatformException platformException = onError;
+      String msgError = "Error registrando nuevo plato: ${platformException.details}";
       presenterAddDishesMVP.notifyViewCloseLoadingWidget();
       presenterAddDishesMVP.notifyViewShowMsgInfo("error", msgError);
     });

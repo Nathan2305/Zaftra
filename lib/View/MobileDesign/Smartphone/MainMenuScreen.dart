@@ -1,12 +1,17 @@
+// @dart=2.9
+
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:RestaurantAdmin/Presenter/PresenterMainMenuMVP.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:imagebutton/imagebutton.dart';
 import 'package:sizer/sizer.dart';
 import 'package:RestaurantAdmin/Utils/Methods.dart';
 import 'package:RestaurantAdmin/Utils/DataSource.dart';
@@ -18,18 +23,43 @@ import 'LoginScreen.dart';
 import 'MiPersonalListScreen.dart';
 import 'MisProductos.dart';
 
-void main() {
-  runApp(MainMenuAdmin());
+class MainMenuScreen extends StatefulWidget {
+  final objectId;
+
+  MainMenuScreen(this.objectId);
+
+  _MainMenuScreen createState() => _MainMenuScreen(objectId);
 }
 
-class MainMenuAdmin extends StatelessWidget implements interfaceMainMenuMVP {
+class _MainMenuScreen extends State<MainMenuScreen>
+    implements interfaceMainMenuMVP {
+  String objectId;
+
+  _MainMenuScreen(this.objectId);
+
+  String _businessName = "";
+  PresenterMainMenuMVP presenterMainMenuMVP;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    presenterMainMenuMVP = PresenterMainMenuMVP(this);
+    presenterMainMenuMVP.requestModelShowFields(objectId);
+    super.initState();
+  }
+
+  final listOptions = {'Mi personal', 'Platos', 'Reporte de consumos'};
+  final listOptionsImage = {
+    'assets/waitress.png',
+    'assets/food_drinks.png',
+    'assets/report.png'
+  };
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    //contextDialogLogOut = context;
-    return Sizer(builder: (context, orientation, deviceType) {
-      bool isMobile = deviceType == DeviceType.mobile;
-      bool isTablet = deviceType == DeviceType.tablet;
+    return Sizer(builder:
+        (BuildContext context, Orientation orientation, DeviceType deviceType) {
       return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -45,8 +75,233 @@ class MainMenuAdmin extends StatelessWidget implements interfaceMainMenuMVP {
             )
           ],
         ),
-        body: MainMenuScreen(),
+        body: Column(
+          children: [
+            Container(
+              width: 100.w,
+              height: 35.h,
+              child: CustomPaint(
+                painter: PainterTitle(),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 5.w, top: 4.h),
+                      child: Text(
+                        _businessName,
+                        style: TextStyle(fontSize: 22.sp, color: Colors.white),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Text('Ventas',
+                                  style: TextStyle(
+                                      fontSize: 15.sp, color: Colors.white)),
+                              Text('1026',
+                                  style: TextStyle(
+                                      fontSize: 15.sp, color: Colors.white))
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Text('Personal',
+                                  style: TextStyle(
+                                      fontSize: 15.sp, color: Colors.white)),
+                              Text('1024',
+                                  style: TextStyle(
+                                      fontSize: 15.sp, color: Colors.white))
+                            ],
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FadeInLeft(
+                            delay: Duration(milliseconds: 50),
+                            child: GestureDetector(
+                              onTap: () {
+                                Methods.startNewRoute(
+                                    context, PersonalScreenState());
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                ),
+                                elevation: 10,
+                                child: Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              DataSource.primaryColorPersonal,
+                                              DataSource.secondaryColorPersonal
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.centerRight)),
+                                    child: Column(
+                                      children: [
+                                        Image(
+                                          image: AssetImage(
+                                              listOptionsImage.elementAt(0)),
+                                          width: 20.w,
+                                          height: 20.w,
+                                        ),
+                                        Container(
+                                          width: 25.w,
+                                          child: Divider(
+                                            color: Colors.white,
+                                            thickness: 2,
+                                          ),
+                                        ),
+                                        Text(
+                                          listOptions.elementAt(0).toString(),
+                                          style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    )),
+                              ),
+                            )),
+                        FadeInRight(
+                            delay: Duration(milliseconds: 50),
+                            child: GestureDetector(
+                              onTap: () {
+                                Methods.startNewRoute(context, MisProductos());
+                              },
+                              child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                  ),
+                                  elevation: 10,
+                                  child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
+                                          gradient: LinearGradient(
+                                              colors: [
+                                               DataSource.primaryColorPlatos,
+                                                DataSource.secondaryColorPlatos
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.centerRight)),
+                                      child: Column(
+                                        children: [
+                                          Image(
+                                            image: AssetImage(
+                                                listOptionsImage.elementAt(1)),
+                                            width: 20.w,
+                                            height: 20.w,
+                                          ),
+                                          Container(
+                                            width: 25.w,
+                                            child: Divider(
+                                              color: Colors.white,
+                                              thickness: 2,
+                                            ),
+                                          ),
+                                          Text(
+                                            listOptions.elementAt(1).toString(),
+                                            style: TextStyle(
+                                                fontSize: 14.sp,
+                                                color: Colors.white),
+                                          ),
+                                        ],
+                                      ))),
+                            )),
+                      ],
+                    ),
+                    FadeInUp(
+                      delay: Duration(milliseconds: 50),
+                      child: Container(
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          elevation: 10,
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                                gradient: LinearGradient(
+                                    colors: [
+                                      DataSource.primaryColorReportes,
+                                      DataSource.secondaryColorReportes
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.centerRight)),
+                            child: Column(
+                              children: [
+                                Image(
+                                  image:
+                                      AssetImage(listOptionsImage.elementAt(2)),
+                                  width: 20.w,
+                                  height: 20.w,
+                                ),
+                                Container(
+                                  width: 25.w,
+                                  child: Divider(
+                                    color: Colors.white,
+                                    thickness: 2,
+                                  ),
+                                ),
+                                Text(
+                                  listOptions.elementAt(2).toString(),
+                                  style: TextStyle(
+                                      fontSize: 14.sp, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       );
+    });
+  }
+
+  @override
+  void notifySuccessfulLogOut() {
+    // TODO: implement notifySuccessfulLogOut
+  }
+
+  @override
+  void notifyViewShowFields(String businessName) {
+    setState(() {
+      _businessName = businessName;
     });
   }
 
@@ -115,263 +370,6 @@ class MainMenuAdmin extends StatelessWidget implements interfaceMainMenuMVP {
             elevation: 24.0,
           );
         });
-  }
-
-  @override
-  void notifySuccessfulLogOut() {
-    // TODO: implement notifySuccessfulLogOut
-    /*Navigator.pushAndRemoveUntil(
-        contextDialogLogOut!,
-        AnimationSource.createRoute(MyAppLoginScreen()),
-            (Route<dynamic> route) => false);*/
-  }
-}
-
-class MainMenuScreen extends StatefulWidget {
-  StateMainMenuScreen createState() => StateMainMenuScreen();
-}
-
-class StateMainMenuScreen extends State<MainMenuScreen>
-    with SingleTickerProviderStateMixin {
-  Timer? timer;
-  double verticalDrag = -90;
-  final listOptions = {
-    'Mi personal',
-    'Platos',
-    'Reporte de consumos'
-  };
-  final listOptionsImage = {
-    'assets/waitress.png',
-    'assets/food_drinks.png',
-    'assets/report.png'
-  };
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      //each second
-      if (verticalDrag == 0) {
-        timer.cancel();
-      } else {
-        setState(() {
-          verticalDrag = verticalDrag + 10;
-        });
-      }
-    });
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    //timer.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    var businessName=MyAppMain.currentUser.getProperty(DataSource.COLUMN_NAME_RESTAURANT).toString();
-    return Column(
-      children: [
-        Container(
-          width: 100.w,
-          height: 35.h,
-          child: CustomPaint(
-            painter: PainterTitle(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 5.w,top: 4.h),
-                  child: Text(businessName,style: TextStyle(fontSize: 22.sp,color: Colors.white),),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Text('Ventas',style: TextStyle(fontSize: 15.sp,color: Colors.white)),
-                          Text('1026',style: TextStyle(fontSize: 15.sp,color: Colors.white))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Text('Personal',style: TextStyle(fontSize: 15.sp,color: Colors.white)),
-                          Text('1024',style: TextStyle(fontSize: 15.sp,color: Colors.white))
-                        ],
-                      ),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ),
-
-        ),
-        Expanded(
-          flex: 1,
-          child: Container(
-           child: Column(
-             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-             children: [
-               Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                 children: [
-                   Transform(
-                     alignment: Alignment.bottomCenter,
-                     transform: Matrix4.identity()
-                       ..setEntry(3, 2, 0.002)
-                       ..rotateX(verticalDrag / 180 * pi),
-                     child: GestureDetector(
-                       onTap: () {
-                         Methods.startNewRoute(context, PersonalScreenState());
-                       },
-                       child: Container(
-                         padding: EdgeInsets.all(10),
-                         decoration: BoxDecoration(
-                             color: DataSource.primaryColor,
-                             boxShadow: [
-                               BoxShadow(
-                                 color: Colors.grey.withOpacity(0.5),
-                                 blurRadius: 10,
-                                 spreadRadius: 5,
-                                 offset: Offset(-10, 10),
-                               ),
-                             ],
-                             borderRadius: BorderRadius.all(Radius.circular(10)),
-                             border: Border.all(
-                                 color: DataSource.primaryColor, width: 3)),
-                         child: Column(
-                           children: [
-                             Image(
-                               image: AssetImage(listOptionsImage.elementAt(0)),
-                               width: 20.w,
-                               height: 20.w,
-                             ),
-                             Container(
-                               width: 25.w,
-                               child: Divider(
-                                 color: Colors.white,
-                                 thickness: 2,
-                               ),
-                             ),
-                             Text(
-                               listOptions.elementAt(0).toString(),
-                               style:
-                               TextStyle(fontSize: 14.sp, color: Colors.white),
-                             ),
-                           ],
-                         ),
-                       ),
-                     ),
-                   ),
-                   Transform(
-                     alignment: Alignment.bottomCenter,
-                     transform: Matrix4.identity()
-                       ..setEntry(3, 2, 0.002)
-                       ..rotateX(verticalDrag / 180 * pi),
-                     child: GestureDetector(
-                       onTap: () {
-                         Methods.startNewRoute(context, MisProductos());
-                       },
-                       child: Container(
-                         padding: EdgeInsets.all(10),
-                         decoration: BoxDecoration(
-                             color: DataSource.primaryColor,
-                             boxShadow: [
-                               BoxShadow(
-                                 color: Colors.grey.withOpacity(0.5),
-                                 blurRadius: 10,
-                                 spreadRadius: 5,
-                                 offset: Offset(-10, 10),
-                               ),
-                             ],
-                             borderRadius: BorderRadius.all(Radius.circular(10)),
-                             border: Border.all(
-                                 color: DataSource.primaryColor, width: 3)),
-                         child: Column(
-                           children: [
-                             Image(
-                               image: AssetImage(listOptionsImage.elementAt(1)),
-                               width: 20.w,
-                               height: 20.w,
-                             ),
-                             Container(
-                               width: 25.w,
-                               child: Divider(
-                                 color: Colors.white,
-                                 thickness: 2,
-                               ),
-                             ),
-                             Text(
-                               listOptions.elementAt(1).toString(),
-                               style:
-                               TextStyle(fontSize: 14.sp, color: Colors.white),
-                             ),
-                           ],
-                         ),
-                       ),
-                     ),
-                   ),
-                 ],
-               ),
-               Transform(
-                 alignment: Alignment.bottomCenter,
-                 transform: Matrix4.identity()
-                   ..setEntry(3, 2, 0.002)
-                   ..rotateX(verticalDrag / 180 * pi),
-                 child: Container(
-                   padding: EdgeInsets.only(left: 10, right: 10),
-                   decoration: BoxDecoration(
-                       color: DataSource.primaryColor,
-                       boxShadow: [
-                         BoxShadow(
-                           color: Colors.grey.withOpacity(0.5),
-                           blurRadius: 10,
-                           spreadRadius: 5,
-                           offset: Offset(-10, 10),
-                         ),
-                       ],
-                       borderRadius: BorderRadius.all(Radius.circular(10)),
-                       border: Border.all(
-                           color: DataSource.primaryColor, width: 3)),
-                   child: Column(
-                     children: [
-                       Image(
-                         image: AssetImage(listOptionsImage.elementAt(2)),
-                         width: 20.w,
-                         height: 20.w,
-                       ),
-                       Container(
-                         width: 45.w,
-                         child: Divider(
-                           color: Colors.white,
-                           thickness: 2,
-                         ),
-                       ),
-                       Text(
-                         listOptions.elementAt(2).toString(),
-                         style:
-                         TextStyle(fontSize: 14.sp, color: Colors.white),
-                       ),
-                     ],
-                   ),
-                 ),
-               )
-             ],
-           ),
-          ),
-        )
-      ],
-    );
   }
 }
 

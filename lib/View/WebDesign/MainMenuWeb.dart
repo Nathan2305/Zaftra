@@ -69,6 +69,11 @@ class _MainMenuWeb extends State<MainMenuWeb> implements interfaceMainMenuMVP {
   void notifySuccessfulLogOut() {
     // TODO: implement notifySuccessfulLogOut
   }
+
+  @override
+  void notifyViewShowFields(String businessName) {
+    // TODO: implement notifyViewShowFields
+  }
 }
 
 class VerticalPanelOptions extends StatelessWidget {

@@ -2,7 +2,6 @@ import 'package:backendless_sdk/backendless_sdk.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:RestaurantAdmin/Utils/DataSource.dart';
-import 'package:RestaurantAdmin/Utils/ResponsiveWidget.dart';
 
 class MyPersonalDetailScreen extends StatelessWidget {
   final BackendlessUser userSelected;
@@ -26,9 +25,7 @@ class MyPersonalDetailScreen extends StatelessWidget {
           centerTitle: true,
           title: Text(fullName),
         ),
-        body: ResponsiveWidget(
-          mobile: MobileLayout(),
-        ),
+        body: MobileLayout(),
       ),
     );
   }
